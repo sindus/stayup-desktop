@@ -1,13 +1,18 @@
+import { useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useLanguage } from "@/context/LanguageContext"
+import type { Translations } from "@/lib/translations"
 
-const schema = z.object({
-  email: z.string().email("Email invalide"),
-  password: z.string().min(1, "Mot de passe requis"),
-})
+function makeSchema(t: Translations) {
+  return z.object({
+    email: z.string().email(t.auth.emailInvalid),
+    password: z.string().min(1, t.auth.passwordRequired),
+  })
+}
 
-type FormValues = z.infer<typeof schema>
+type FormValues = { email: string; password: string }
 
 interface LoginFormProps {
   onSubmit: (email: string, password: string) => Promise<void>
@@ -16,6 +21,9 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSubmit, loading, error }: LoginFormProps) {
+  const { t } = useLanguage()
+  const schema = useMemo(() => makeSchema(t), [t])
+
   const {
     register,
     handleSubmit,
@@ -29,7 +37,7 @@ export function LoginForm({ onSubmit, loading, error }: LoginFormProps) {
     >
       <div className="flex flex-col gap-1">
         <label htmlFor="email" className="text-sm font-medium">
-          Email
+          {t.auth.email}
         </label>
         <input
           id="email"
@@ -43,7 +51,7 @@ export function LoginForm({ onSubmit, loading, error }: LoginFormProps) {
 
       <div className="flex flex-col gap-1">
         <label htmlFor="password" className="text-sm font-medium">
-          Mot de passe
+          {t.auth.password}
         </label>
         <input
           id="password"
@@ -62,7 +70,7 @@ export function LoginForm({ onSubmit, loading, error }: LoginFormProps) {
         disabled={loading}
         className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
       >
-        {loading ? "Connexion…" : "Se connecter"}
+        {loading ? t.auth.signingIn : t.auth.signIn}
       </button>
     </form>
   )

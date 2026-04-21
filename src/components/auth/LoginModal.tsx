@@ -1,6 +1,7 @@
 import { LoginForm } from "./LoginForm"
 import { OAuthButtons } from "./OAuthButtons"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
+import { useLanguage } from "@/context/LanguageContext"
 
 interface LoginModalProps {
   onLogin: (email: string, password: string) => Promise<void>
@@ -10,6 +11,8 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ onLogin, onOAuth, loading, error }: LoginModalProps) {
+  const { t } = useLanguage()
+
   return (
     <div className="flex items-center justify-center h-screen bg-background text-foreground">
       <div className="absolute top-3 right-3">
@@ -18,9 +21,7 @@ export function LoginModal({ onLogin, onOAuth, loading, error }: LoginModalProps
       <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-sm">
         <div className="mb-6 text-center">
           <h1 className="text-xl font-semibold tracking-tight">StayUp</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Connectez-vous pour accéder à vos flux
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t.auth.subtitle}</p>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -31,7 +32,7 @@ export function LoginModal({ onLogin, onOAuth, loading, error }: LoginModalProps
               <span className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">ou</span>
+              <span className="bg-card px-2 text-muted-foreground">{t.auth.or}</span>
             </div>
           </div>
 

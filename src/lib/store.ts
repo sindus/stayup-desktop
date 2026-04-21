@@ -1,9 +1,11 @@
 import { load } from "@tauri-apps/plugin-store"
 import type { Store } from "@tauri-apps/plugin-store"
+import type { Language } from "@/lib/translations"
 
 const STORE_FILE = "settings.json"
 const AUTH_KEY = "auth_token"
 const API_URL_KEY = "api_url"
+const LANG_KEY = "lang"
 const DEFAULT_API_URL = "https://stayup-api.r-sik.workers.dev"
 
 let _store: Store | null = null
@@ -33,4 +35,14 @@ export async function clearToken(): Promise<void> {
 export async function readApiUrl(): Promise<string> {
   const store = await getStore()
   return (await store.get<string>(API_URL_KEY)) ?? DEFAULT_API_URL
+}
+
+export async function readLang(): Promise<Language | null> {
+  const store = await getStore()
+  return (await store.get<Language>(LANG_KEY)) ?? null
+}
+
+export async function writeLang(lang: Language): Promise<void> {
+  const store = await getStore()
+  await store.set(LANG_KEY, lang)
 }

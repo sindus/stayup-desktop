@@ -2,9 +2,12 @@ import { createContext, useContext, useState, useEffect } from "react"
 
 type Theme = "light" | "dark"
 
+export type { Theme }
+
 interface ThemeContextType {
   theme: Theme
   toggleTheme: () => void
+  setTheme: (t: Theme) => void
 }
 
 const ThemeContext = createContext<ThemeContextType | null>(null)
@@ -33,7 +36,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"))
 
-  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  )
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

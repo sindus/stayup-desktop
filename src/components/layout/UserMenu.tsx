@@ -1,3 +1,4 @@
+import { useLanguage } from "@/context/LanguageContext"
 import type { AppSession } from "@/lib/session"
 
 interface UserMenuProps {
@@ -6,6 +7,8 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ session, onLogout }: UserMenuProps) {
+  const { t } = useLanguage()
+
   return (
     <div className="flex items-center gap-3">
       <span className="text-sm text-muted-foreground truncate max-w-[160px]">{session.email}</span>
@@ -13,7 +16,7 @@ export function UserMenu({ session, onLogout }: UserMenuProps) {
         onClick={onLogout}
         className="text-xs text-muted-foreground hover:text-foreground transition-colors"
       >
-        Déconnexion
+        {t.userMenu.signOut}
       </button>
     </div>
   )

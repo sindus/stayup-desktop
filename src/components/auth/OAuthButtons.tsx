@@ -1,9 +1,13 @@
+import { useLanguage } from "@/context/LanguageContext"
+
 interface OAuthButtonsProps {
   onOAuth: (provider: "github" | "google") => Promise<void>
   loading: boolean
 }
 
 export function OAuthButtons({ onOAuth, loading }: OAuthButtonsProps) {
+  const { t } = useLanguage()
+
   return (
     <div className="flex flex-col gap-2">
       <button
@@ -13,7 +17,7 @@ export function OAuthButtons({ onOAuth, loading }: OAuthButtonsProps) {
         className="flex h-9 items-center justify-center gap-2 rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
       >
         <GithubIcon />
-        Continuer avec GitHub
+        {t.auth.continueWithGitHub}
       </button>
       <button
         type="button"
@@ -22,7 +26,7 @@ export function OAuthButtons({ onOAuth, loading }: OAuthButtonsProps) {
         className="flex h-9 items-center justify-center gap-2 rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
       >
         <GoogleIcon />
-        Continuer avec Google
+        {t.auth.continueWithGoogle}
       </button>
     </div>
   )

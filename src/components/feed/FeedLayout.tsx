@@ -1,5 +1,9 @@
+import { useCallback } from "react"
 import { useNavigationStore } from "@/store/navigation"
 import { useFeed } from "@/hooks/useFeed"
+import { useMenu } from "@/hooks/useMenu"
+import { useLanguage } from "@/context/LanguageContext"
+import { useTheme } from "@/context/ThemeContext"
 import { FeedSidebar } from "./FeedSidebar"
 import { FeedItemList } from "./FeedItemList"
 import { UnifiedFeedList } from "./UnifiedFeedList"
@@ -10,11 +14,26 @@ import type { AppSession } from "@/lib/session"
 interface FeedLayoutProps {
   session: AppSession
   onLogout: () => void
+  onCheckUpdates: () => void
 }
 
-export function FeedLayout({ session, onLogout }: FeedLayoutProps) {
+export function FeedLayout({ session, onLogout, onCheckUpdates }: FeedLayoutProps) {
   const { selection } = useNavigationStore()
   const { fluxes, connectors, loading, error, refresh } = useFeed(session.userId)
+  const { lang, t, setLang } = useLanguage()
+  const { theme, setTheme } = useTheme()
+
+  const stableRefresh = useCallback(() => refresh(), [refresh])
+
+  useMenu({
+    lang,
+    t,
+    theme,
+    setLang,
+    setTheme,
+    onCheckUpdates,
+    onRefresh: stableRefresh,
+  })
 
   const repositories = fluxes.map((f) => ({
     repository_id: f.repository_id,
@@ -23,14 +42,16 @@ export function FeedLayout({ session, onLogout }: FeedLayoutProps) {
 
   function renderContent() {
     if (loading) {
-      return <p className="text-sm text-muted-foreground italic py-12 text-center">Chargement…</p>
+      return (
+        <p className="text-sm text-muted-foreground italic py-12 text-center">{t.feed.loading}</p>
+      )
     }
     if (error) {
       return (
         <div className="py-12 text-center space-y-2">
           <p className="text-sm text-destructive">{error}</p>
           <button onClick={refresh} className="text-xs text-muted-foreground underline">
-            Réessayer
+            {t.feed.retry}
           </button>
         </div>
       )
@@ -86,7 +107,7 @@ export function FeedLayout({ session, onLogout }: FeedLayoutProps) {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground">
+    <div className="flex flex-col flex-1 overflow-hidden bg-background text-foreground">
       <header className="flex items-center justify-between border-b px-6 py-3 shrink-0">
         <span className="font-semibold text-sm">StayUp</span>
         <div className="flex items-center gap-2">

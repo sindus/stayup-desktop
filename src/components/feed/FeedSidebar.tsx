@@ -10,18 +10,9 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useNavigationStore } from "@/store/navigation"
+import { useLanguage } from "@/context/LanguageContext"
 import type { FeedFlux } from "@/hooks/useFeed"
 import type { Provider } from "@/types"
-
-const PROVIDER_CONFIG: Record<
-  Provider,
-  { label: string; icon: React.ComponentType<{ className?: string }> }
-> = {
-  changelog: { label: "GitHub Changelog", icon: GitBranch },
-  youtube: { label: "YouTube", icon: PlaySquare },
-  rss: { label: "RSS", icon: Rss },
-  scrap: { label: "Scraping web", icon: Globe },
-}
 
 interface FeedSidebarProps {
   fluxes: FeedFlux[]
@@ -29,7 +20,18 @@ interface FeedSidebarProps {
 
 export function FeedSidebar({ fluxes }: FeedSidebarProps) {
   const { selection, setSelection } = useNavigationStore()
+  const { t } = useLanguage()
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+
+  const providerConfig: Record<
+    Provider,
+    { label: string; icon: React.ComponentType<{ className?: string }> }
+  > = {
+    changelog: { label: t.feed.providers.changelog, icon: GitBranch },
+    youtube: { label: t.feed.providers.youtube, icon: PlaySquare },
+    rss: { label: t.feed.providers.rss, icon: Rss },
+    scrap: { label: t.feed.providers.scrap, icon: Globe },
+  }
 
   const byProvider = fluxes.reduce<Partial<Record<Provider, FeedFlux[]>>>((acc, flux) => {
     ;(acc[flux.provider] ??= []).push(flux)
@@ -52,7 +54,7 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
     <aside className="w-56 shrink-0 border-r pr-4 overflow-y-auto">
       <div className="mb-4">
         <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Mes flux
+          {t.feed.myFeeds}
         </span>
       </div>
 
@@ -67,11 +69,11 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
           )}
         >
           <LayoutList className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">Tous les flux</span>
+          <span className="truncate">{t.feed.allFeeds}</span>
         </button>
 
         {providers.map((provider) => {
-          const { label, icon: Icon } = PROVIDER_CONFIG[provider]
+          const { label, icon: Icon } = providerConfig[provider]
           const isCategoryActive = selection.type === "category" && selection.provider === provider
           const open = isExpanded(provider)
 

@@ -1,0 +1,62 @@
+export const fr = {
+  auth: {
+    subtitle: "Connectez-vous pour accéder à vos flux",
+    email: "Email",
+    password: "Mot de passe",
+    signIn: "Se connecter",
+    signingIn: "Connexion…",
+    emailInvalid: "Email invalide",
+    passwordRequired: "Mot de passe requis",
+    continueWithGitHub: "Continuer avec GitHub",
+    continueWithGoogle: "Continuer avec Google",
+    or: "ou",
+  },
+  feed: {
+    myFeeds: "Mes flux",
+    allFeeds: "Tous les flux",
+    loading: "Chargement…",
+    retry: "Réessayer",
+    providers: {
+      changelog: "GitHub Changelog",
+      youtube: "YouTube",
+      rss: "RSS",
+      scrap: "Scraping web",
+    },
+  },
+  userMenu: {
+    signOut: "Déconnexion",
+  },
+  menu: {
+    file: {
+      title: "Fichier",
+      checkForUpdates: "Mettre à jour",
+      refresh: "Actualiser",
+      quit: "Quitter",
+    },
+    language: {
+      title: "Langue",
+      french: "🇫🇷 Français",
+      english: "🇬🇧 English",
+    },
+    display: {
+      title: "Affichage",
+      lightMode: "Mode normal",
+      darkMode: "Mode sombre",
+      fullscreen: "Plein écran",
+    },
+    help: {
+      title: "Aide",
+      about: "À propos de StayUp",
+    },
+  },
+  updater: {
+    checking: "Vérification des mises à jour…",
+    upToDate: "Vous êtes à jour.",
+    updateAvailable: "Mise à jour disponible",
+    downloading: "Téléchargement en cours…",
+    restarting: "Redémarrage…",
+    error: "Erreur lors de la vérification des mises à jour.",
+  },
+}
+
+export type Translations = typeof fr
