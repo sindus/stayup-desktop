@@ -11,7 +11,8 @@ describe("cn", () => {
   })
 
   it("ignores falsy values", () => {
-    expect(cn("px-2", false && "py-2", null, undefined)).toBe("px-2")
+    const condition = false
+    expect(cn("px-2", condition && "py-2", null, undefined)).toBe("px-2")
   })
 
   it("handles conditional classes via objects", () => {
