@@ -7,43 +7,36 @@ import type {
   ScrapItem,
   ScrapItemParams,
   Provider,
-} from "@/types";
-import { formatDate, openUrl } from "@/lib/utils";
+} from "@/types"
+import { formatDate, openUrl } from "@/lib/utils"
 
-type AnyItem = ChangelogItem | YoutubeItem | RssItem | ScrapItem;
+type AnyItem = ChangelogItem | YoutubeItem | RssItem | ScrapItem
 
 function getItemDate(item: AnyItem): string {
-  if ("datetime" in item && item.datetime) return item.datetime;
-  return item.executed_at;
+  if ("datetime" in item && item.datetime) return item.datetime
+  return item.executed_at
 }
 
 interface FeedItemListProps {
-  items: AnyItem[];
-  provider: Provider;
-  repositories?: { repository_id: number; url: string }[];
+  items: AnyItem[]
+  provider: Provider
+  repositories?: { repository_id: number; url: string }[]
 }
 
-export function FeedItemList({
-  items,
-  provider,
-  repositories = [],
-}: FeedItemListProps) {
+export function FeedItemList({ items, provider, repositories = [] }: FeedItemListProps) {
   if (items.length === 0) {
     return (
       <p className="text-sm text-muted-foreground italic py-12 text-center">
         Aucun contenu disponible.
       </p>
-    );
+    )
   }
 
-  const repoUrlMap = Object.fromEntries(
-    repositories.map((r) => [r.repository_id, r.url])
-  );
+  const repoUrlMap = Object.fromEntries(repositories.map((r) => [r.repository_id, r.url]))
 
   const sorted = [...items].sort(
-    (a, b) =>
-      new Date(getItemDate(b)).getTime() - new Date(getItemDate(a)).getTime()
-  );
+    (a, b) => new Date(getItemDate(b)).getTime() - new Date(getItemDate(a)).getTime(),
+  )
 
   return (
     <div className="space-y-4">
@@ -56,29 +49,17 @@ export function FeedItemList({
           />
         ))}
       {provider === "youtube" &&
-        (sorted as YoutubeItem[]).map((item) => (
-          <YoutubeEntry key={item.id} item={item} />
-        ))}
+        (sorted as YoutubeItem[]).map((item) => <YoutubeEntry key={item.id} item={item} />)}
       {provider === "rss" &&
-        (sorted as RssItem[]).map((item) => (
-          <RssEntry key={item.id} item={item} />
-        ))}
+        (sorted as RssItem[]).map((item) => <RssEntry key={item.id} item={item} />)}
       {provider === "scrap" &&
-        (sorted as ScrapItem[]).map((item) => (
-          <ScrapEntry key={item.id} item={item} />
-        ))}
+        (sorted as ScrapItem[]).map((item) => <ScrapEntry key={item.id} item={item} />)}
     </div>
-  );
+  )
 }
 
-function ChangelogEntry({
-  item,
-  repoUrl,
-}: {
-  item: ChangelogItem;
-  repoUrl: string;
-}) {
-  const href = repoUrl ? `${repoUrl}/releases/tag/${item.version}` : undefined;
+function ChangelogEntry({ item, repoUrl }: { item: ChangelogItem; repoUrl: string }) {
+  const href = repoUrl ? `${repoUrl}/releases/tag/${item.version}` : undefined
 
   const content = (
     <div className="space-y-1 border-l-2 border-muted pl-3 py-1">
@@ -99,28 +80,28 @@ function ChangelogEntry({
         </p>
       )}
     </div>
-  );
+  )
 
-  if (!href) return content;
+  if (!href) return content
 
   return (
     <a
       href={href}
       onClick={(e) => {
-        e.preventDefault();
-        void openUrl(href);
+        e.preventDefault()
+        void openUrl(href)
       }}
       className="block cursor-pointer"
     >
       {content}
     </a>
-  );
+  )
 }
 
 function YoutubeEntry({ item }: { item: YoutubeItem }) {
-  let parsed: YoutubeItemContent | null = null;
+  let parsed: YoutubeItemContent | null = null
   try {
-    parsed = JSON.parse(item.content) as YoutubeItemContent;
+    parsed = JSON.parse(item.content) as YoutubeItemContent
   } catch {
     // ignore
   }
@@ -138,37 +119,35 @@ function YoutubeEntry({ item }: { item: YoutubeItem }) {
         />
       )}
       <div className="space-y-1 min-w-0">
-        <p className="font-medium text-sm line-clamp-2">
-          {parsed?.title ?? "Sans titre"}
-        </p>
+        <p className="font-medium text-sm line-clamp-2">{parsed?.title ?? "Sans titre"}</p>
         <p className="text-xs text-muted-foreground">
           {formatDate(item.datetime ?? item.executed_at)}
         </p>
       </div>
     </div>
-  );
+  )
 
-  const videoUrl = parsed?.link ?? parsed?.url;
-  if (!videoUrl) return inner;
+  const videoUrl = parsed?.link ?? parsed?.url
+  if (!videoUrl) return inner
 
   return (
     <a
       href={videoUrl}
       onClick={(e) => {
-        e.preventDefault();
-        void openUrl(videoUrl);
+        e.preventDefault()
+        void openUrl(videoUrl)
       }}
       className="block cursor-pointer"
     >
       {inner}
     </a>
-  );
+  )
 }
 
 function RssEntry({ item }: { item: RssItem }) {
-  let parsed: RssItemContent | null = null;
+  let parsed: RssItemContent | null = null
   try {
-    parsed = JSON.parse(item.content) as RssItemContent;
+    parsed = JSON.parse(item.content) as RssItemContent
   } catch {
     // ignore
   }
@@ -176,9 +155,7 @@ function RssEntry({ item }: { item: RssItem }) {
   const inner = (
     <div className="space-y-1 border-l-2 border-muted pl-3 py-1">
       <div className="flex items-center justify-between gap-2">
-        <span className="font-medium text-sm line-clamp-1">
-          {parsed?.title ?? "Sans titre"}
-        </span>
+        <span className="font-medium text-sm line-clamp-1">{parsed?.title ?? "Sans titre"}</span>
         {item.datetime && (
           <span className="text-xs text-muted-foreground shrink-0">
             {formatDate(item.datetime)}
@@ -186,28 +163,26 @@ function RssEntry({ item }: { item: RssItem }) {
         )}
       </div>
       {parsed?.summary && (
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {parsed.summary}
-        </p>
+        <p className="text-sm text-muted-foreground line-clamp-2">{parsed.summary}</p>
       )}
     </div>
-  );
+  )
 
-  if (!parsed?.link) return inner;
+  if (!parsed?.link) return inner
 
-  const link = parsed.link;
+  const link = parsed.link
   return (
     <a
       href={link}
       onClick={(e) => {
-        e.preventDefault();
-        void openUrl(link);
+        e.preventDefault()
+        void openUrl(link)
       }}
       className="block cursor-pointer"
     >
       {inner}
     </a>
-  );
+  )
 }
 
 function ScrapEntry({ item }: { item: ScrapItem }) {
@@ -215,20 +190,18 @@ function ScrapEntry({ item }: { item: ScrapItem }) {
     typeof item.params === "string"
       ? (() => {
           try {
-            return JSON.parse(item.params) as ScrapItemParams;
+            return JSON.parse(item.params) as ScrapItemParams
           } catch {
-            return null;
+            return null
           }
         })()
-      : (item.params as ScrapItemParams | null);
+      : (item.params as ScrapItemParams | null)
 
   const inner = (
     <div className="space-y-1 border-l-2 border-muted pl-3 py-1">
       <div className="flex items-center justify-between gap-2">
         {params?.url && (
-          <span className="font-mono text-xs text-muted-foreground line-clamp-1">
-            {params.url}
-          </span>
+          <span className="font-mono text-xs text-muted-foreground line-clamp-1">{params.url}</span>
         )}
         <span className="text-xs text-muted-foreground shrink-0">
           {formatDate(item.executed_at)}
@@ -240,21 +213,21 @@ function ScrapEntry({ item }: { item: ScrapItem }) {
         </p>
       )}
     </div>
-  );
+  )
 
-  if (!params?.url) return inner;
+  if (!params?.url) return inner
 
-  const url = params.url;
+  const url = params.url
   return (
     <a
       href={url}
       onClick={(e) => {
-        e.preventDefault();
-        void openUrl(url);
+        e.preventDefault()
+        void openUrl(url)
       }}
       className="block cursor-pointer"
     >
       {inner}
     </a>
-  );
+  )
 }

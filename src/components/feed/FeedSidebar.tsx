@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from "react"
 import {
   GitBranch,
   PlaySquare,
@@ -7,11 +7,11 @@ import {
   ChevronDown,
   ChevronRight,
   LayoutList,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useNavigationStore } from "@/store/navigation";
-import type { FeedFlux } from "@/hooks/useFeed";
-import type { Provider } from "@/types";
+} from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useNavigationStore } from "@/store/navigation"
+import type { FeedFlux } from "@/hooks/useFeed"
+import type { Provider } from "@/types"
 
 const PROVIDER_CONFIG: Record<
   Provider,
@@ -21,35 +21,32 @@ const PROVIDER_CONFIG: Record<
   youtube: { label: "YouTube", icon: PlaySquare },
   rss: { label: "RSS", icon: Rss },
   scrap: { label: "Scraping web", icon: Globe },
-};
+}
 
 interface FeedSidebarProps {
-  fluxes: FeedFlux[];
+  fluxes: FeedFlux[]
 }
 
 export function FeedSidebar({ fluxes }: FeedSidebarProps) {
-  const { selection, setSelection } = useNavigationStore();
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const { selection, setSelection } = useNavigationStore()
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 
-  const byProvider = fluxes.reduce<Partial<Record<Provider, FeedFlux[]>>>(
-    (acc, flux) => {
-      (acc[flux.provider] ??= []).push(flux);
-      return acc;
-    },
-    {}
-  );
+  const byProvider = fluxes.reduce<Partial<Record<Provider, FeedFlux[]>>>((acc, flux) => {
+    ;(acc[flux.provider] ??= []).push(flux)
+    return acc
+  }, {})
 
-  const providers = Object.keys(byProvider) as Provider[];
+  const providers = Object.keys(byProvider) as Provider[]
 
   function isExpanded(provider: Provider) {
-    return expanded[provider] !== false;
+    return expanded[provider] !== false
   }
 
   function toggleExpanded(provider: Provider) {
-    setExpanded((prev) => ({ ...prev, [provider]: !isExpanded(provider) }));
+    setExpanded((prev) => ({ ...prev, [provider]: !isExpanded(provider) }))
   }
 
-  const isAllActive = selection.type === "all";
+  const isAllActive = selection.type === "all"
 
   return (
     <aside className="w-56 shrink-0 border-r pr-4 overflow-y-auto">
@@ -66,7 +63,7 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
             "flex w-full items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors",
             isAllActive
               ? "bg-accent text-accent-foreground font-medium"
-              : "text-foreground hover:bg-muted"
+              : "text-foreground hover:bg-muted",
           )}
         >
           <LayoutList className="h-3.5 w-3.5 shrink-0" />
@@ -74,10 +71,9 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
         </button>
 
         {providers.map((provider) => {
-          const { label, icon: Icon } = PROVIDER_CONFIG[provider];
-          const isCategoryActive =
-            selection.type === "category" && selection.provider === provider;
-          const open = isExpanded(provider);
+          const { label, icon: Icon } = PROVIDER_CONFIG[provider]
+          const isCategoryActive = selection.type === "category" && selection.provider === provider
+          const open = isExpanded(provider)
 
           return (
             <div key={provider}>
@@ -98,7 +94,7 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
                     "flex flex-1 items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors",
                     isCategoryActive
                       ? "bg-accent text-accent-foreground font-medium"
-                      : "text-foreground hover:bg-muted"
+                      : "text-foreground hover:bg-muted",
                   )}
                 >
                   <Icon className="h-3.5 w-3.5 shrink-0" />
@@ -109,9 +105,7 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
               {open && (
                 <div className="ml-7 mt-0.5 space-y-0.5 mb-1">
                   {(byProvider[provider] ?? []).map((flux) => {
-                    const isActive =
-                      selection.type === "flux" &&
-                      selection.fluxId === flux.id;
+                    const isActive = selection.type === "flux" && selection.fluxId === flux.id
                     return (
                       <button
                         key={flux.id}
@@ -126,19 +120,19 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
                           "w-full truncate px-2 py-1 text-sm rounded-md transition-colors text-left",
                           isActive
                             ? "bg-accent text-accent-foreground font-medium"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
                         )}
                       >
                         {flux.identifier}
                       </button>
-                    );
+                    )
                   })}
                 </div>
               )}
             </div>
-          );
+          )
         })}
       </nav>
     </aside>
-  );
+  )
 }

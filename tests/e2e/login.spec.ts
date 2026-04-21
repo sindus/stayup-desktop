@@ -21,7 +21,9 @@ test("renders email and password fields in the login form", async ({ page }) => 
 test("shows validation errors when submitting an empty form", async ({ page }) => {
   await page.goto("/")
   await page.getByRole("button", { name: "Se connecter" }).click()
-  await expect(page.getByText("Email invalide").or(page.getByText("Mot de passe requis"))).toBeVisible()
+  await expect(
+    page.getByText("Email invalide").or(page.getByText("Mot de passe requis")),
+  ).toBeVisible()
 })
 
 test("shows an error for an invalid email format", async ({ page }) => {

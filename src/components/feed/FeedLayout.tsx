@@ -1,50 +1,41 @@
-import { useNavigationStore } from "@/store/navigation";
-import { useFeed } from "@/hooks/useFeed";
-import { FeedSidebar } from "./FeedSidebar";
-import { FeedItemList } from "./FeedItemList";
-import { UnifiedFeedList } from "./UnifiedFeedList";
-import { UserMenu } from "@/components/layout/UserMenu";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import type { AppSession } from "@/lib/session";
+import { useNavigationStore } from "@/store/navigation"
+import { useFeed } from "@/hooks/useFeed"
+import { FeedSidebar } from "./FeedSidebar"
+import { FeedItemList } from "./FeedItemList"
+import { UnifiedFeedList } from "./UnifiedFeedList"
+import { UserMenu } from "@/components/layout/UserMenu"
+import { ThemeToggle } from "@/components/ui/ThemeToggle"
+import type { AppSession } from "@/lib/session"
 
 interface FeedLayoutProps {
-  session: AppSession;
-  onLogout: () => void;
+  session: AppSession
+  onLogout: () => void
 }
 
 export function FeedLayout({ session, onLogout }: FeedLayoutProps) {
-  const { selection } = useNavigationStore();
-  const { fluxes, connectors, loading, error, refresh } = useFeed(
-    session.userId
-  );
+  const { selection } = useNavigationStore()
+  const { fluxes, connectors, loading, error, refresh } = useFeed(session.userId)
 
   const repositories = fluxes.map((f) => ({
     repository_id: f.repository_id,
     url: f.url,
-  }));
+  }))
 
   function renderContent() {
     if (loading) {
-      return (
-        <p className="text-sm text-muted-foreground italic py-12 text-center">
-          Chargement…
-        </p>
-      );
+      return <p className="text-sm text-muted-foreground italic py-12 text-center">Chargement…</p>
     }
     if (error) {
       return (
         <div className="py-12 text-center space-y-2">
           <p className="text-sm text-destructive">{error}</p>
-          <button
-            onClick={refresh}
-            className="text-xs text-muted-foreground underline"
-          >
+          <button onClick={refresh} className="text-xs text-muted-foreground underline">
             Réessayer
           </button>
         </div>
-      );
+      )
     }
-    if (!connectors) return null;
+    if (!connectors) return null
 
     if (selection.type === "all") {
       return (
@@ -55,11 +46,11 @@ export function FeedLayout({ session, onLogout }: FeedLayoutProps) {
           scrap={connectors.scrap}
           repositories={repositories}
         />
-      );
+      )
     }
 
     if (selection.type === "category") {
-      const { provider } = selection;
+      const { provider } = selection
       const items =
         provider === "changelog"
           ? connectors.changelog
@@ -67,21 +58,15 @@ export function FeedLayout({ session, onLogout }: FeedLayoutProps) {
             ? connectors.youtube
             : provider === "rss"
               ? connectors.rss
-              : connectors.scrap;
+              : connectors.scrap
 
-      return (
-        <FeedItemList
-          items={items}
-          provider={provider}
-          repositories={repositories}
-        />
-      );
+      return <FeedItemList items={items} provider={provider} repositories={repositories} />
     }
 
     if (selection.type === "flux") {
-      const { fluxId, provider } = selection;
-      const flux = fluxes.find((f) => f.id === fluxId);
-      const repoId = flux?.repository_id;
+      const { fluxId, provider } = selection
+      const flux = fluxes.find((f) => f.id === fluxId)
+      const repoId = flux?.repository_id
 
       const allItems =
         provider === "changelog"
@@ -90,22 +75,14 @@ export function FeedLayout({ session, onLogout }: FeedLayoutProps) {
             ? connectors.youtube
             : provider === "rss"
               ? connectors.rss
-              : connectors.scrap;
+              : connectors.scrap
 
-      const filtered = repoId
-        ? allItems.filter((item) => item.repository_id === repoId)
-        : allItems;
+      const filtered = repoId ? allItems.filter((item) => item.repository_id === repoId) : allItems
 
-      return (
-        <FeedItemList
-          items={filtered}
-          provider={provider}
-          repositories={repositories}
-        />
-      );
+      return <FeedItemList items={filtered} provider={provider} repositories={repositories} />
     }
 
-    return null;
+    return null
   }
 
   return (
@@ -123,5 +100,5 @@ export function FeedLayout({ session, onLogout }: FeedLayoutProps) {
         <main className="flex-1 overflow-y-auto">{renderContent()}</main>
       </div>
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-export type Provider = 'changelog' | 'youtube' | 'rss' | 'scrap'
+export type Provider = "changelog" | "youtube" | "rss" | "scrap"
 
 export interface UserRepository {
   id: string

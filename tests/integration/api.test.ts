@@ -43,10 +43,7 @@ describe("loginWithPassword", () => {
     })
     vi.stubGlobal("fetch", fetchMock)
     await loginWithPassword("u@test.com", "pass", "https://api.example.com/")
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://api.example.com/auth/login",
-      expect.anything(),
-    )
+    expect(fetchMock).toHaveBeenCalledWith("https://api.example.com/auth/login", expect.anything())
   })
 })
 

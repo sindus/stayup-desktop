@@ -1,12 +1,12 @@
-import { LoginForm } from "./LoginForm";
-import { OAuthButtons } from "./OAuthButtons";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LoginForm } from "./LoginForm"
+import { OAuthButtons } from "./OAuthButtons"
+import { ThemeToggle } from "@/components/ui/ThemeToggle"
 
 interface LoginModalProps {
-  onLogin: (email: string, password: string) => Promise<void>;
-  onOAuth: (provider: "github" | "google") => Promise<void>;
-  loading: boolean;
-  error: string | null;
+  onLogin: (email: string, password: string) => Promise<void>
+  onOAuth: (provider: "github" | "google") => Promise<void>
+  loading: boolean
+  error: string | null
 }
 
 export function LoginModal({ onLogin, onOAuth, loading, error }: LoginModalProps) {
@@ -39,5 +39,5 @@ export function LoginModal({ onLogin, onOAuth, loading, error }: LoginModalProps
         </div>
       </div>
     </div>
-  );
+  )
 }

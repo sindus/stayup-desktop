@@ -1,18 +1,18 @@
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const schema = z.object({
   email: z.string().email("Email invalide"),
   password: z.string().min(1, "Mot de passe requis"),
-});
+})
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof schema>
 
 interface LoginFormProps {
-  onSubmit: (email: string, password: string) => Promise<void>;
-  loading: boolean;
-  error: string | null;
+  onSubmit: (email: string, password: string) => Promise<void>
+  loading: boolean
+  error: string | null
 }
 
 export function LoginForm({ onSubmit, loading, error }: LoginFormProps) {
@@ -20,7 +20,7 @@ export function LoginForm({ onSubmit, loading, error }: LoginFormProps) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) });
+  } = useForm<FormValues>({ resolver: zodResolver(schema) })
 
   return (
     <form
@@ -38,9 +38,7 @@ export function LoginForm({ onSubmit, loading, error }: LoginFormProps) {
           className="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           {...register("email")}
         />
-        {errors.email && (
-          <p className="text-xs text-destructive">{errors.email.message}</p>
-        )}
+        {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
       </div>
 
       <div className="flex flex-col gap-1">
@@ -54,9 +52,7 @@ export function LoginForm({ onSubmit, loading, error }: LoginFormProps) {
           className="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           {...register("password")}
         />
-        {errors.password && (
-          <p className="text-xs text-destructive">{errors.password.message}</p>
-        )}
+        {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
       </div>
 
       {error && <p className="text-xs text-destructive">{error}</p>}
@@ -69,5 +65,5 @@ export function LoginForm({ onSubmit, loading, error }: LoginFormProps) {
         {loading ? "Connexion…" : "Se connecter"}
       </button>
     </form>
-  );
+  )
 }
