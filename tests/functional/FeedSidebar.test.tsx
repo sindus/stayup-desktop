@@ -61,8 +61,8 @@ describe("FeedSidebar", () => {
 
     const buttons = screen.getAllByRole("button")
     const chevronButtons = buttons.filter((b) => b.textContent?.trim() === "")
-    // chevronButtons[0] = changelog, chevronButtons[1] = youtube
-    fireEvent.click(chevronButtons[1])
+    // chevronButtons[0] = "+" add button, chevronButtons[1] = changelog, chevronButtons[2] = youtube
+    fireEvent.click(chevronButtons[2])
 
     expect(screen.queryByText("@fireship")).not.toBeInTheDocument()
     expect(screen.queryByText("@theo")).not.toBeInTheDocument()
