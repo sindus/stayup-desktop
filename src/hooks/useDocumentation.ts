@@ -100,7 +100,8 @@ export function useDocContent(docId: number): UseDocContentState {
         const [token, apiUrl] = await Promise.all([readToken(), readApiUrl()])
         if (!token) throw new Error("Token manquant")
         const data = await getDocContent(docId, token, apiUrl)
-        if (!cancelled) setState({ doc: data.doc, current: data.current, loading: false, error: null })
+        if (!cancelled)
+          setState({ doc: data.doc, current: data.current, loading: false, error: null })
       } catch (err) {
         if (!cancelled)
           setState((s) => ({
@@ -193,7 +194,14 @@ export function useDocDiff(docId: number, versionId: number): UseDocDiffState {
 
   useEffect(() => {
     let cancelled = false
-    setState({ docName: "", version: null, diff: null, scraped_at: null, loading: true, error: null })
+    setState({
+      docName: "",
+      version: null,
+      diff: null,
+      scraped_at: null,
+      loading: true,
+      error: null,
+    })
 
     async function load() {
       try {

@@ -124,21 +124,13 @@ export async function getDocDiff(
   )
 }
 
-export async function subscribeDoc(
-  docId: number,
-  token: string,
-  apiUrl: string,
-): Promise<void> {
+export async function subscribeDoc(docId: number, token: string, apiUrl: string): Promise<void> {
   await apiFetch<{ success: boolean }>(`/documentation/${docId}/subscribe`, token, apiUrl, {
     method: "POST",
   })
 }
 
-export async function unsubscribeDoc(
-  docId: number,
-  token: string,
-  apiUrl: string,
-): Promise<void> {
+export async function unsubscribeDoc(docId: number, token: string, apiUrl: string): Promise<void> {
   await apiFetch<{ success: boolean }>(`/documentation/${docId}/subscribe`, token, apiUrl, {
     method: "DELETE",
   })
@@ -151,11 +143,7 @@ export async function getScrapRepos(token: string, apiUrl: string): Promise<Scra
   return data.repos
 }
 
-export async function subscribeScrap(
-  repoId: number,
-  token: string,
-  apiUrl: string,
-): Promise<void> {
+export async function subscribeScrap(repoId: number, token: string, apiUrl: string): Promise<void> {
   await apiFetch<{ success: boolean }>(`/scrap/${repoId}/subscribe`, token, apiUrl, {
     method: "POST",
   })

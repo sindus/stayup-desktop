@@ -13,7 +13,11 @@ export function HistoryList({ docId }: HistoryListProps) {
   const { docName, versions, loading, error } = useDocHistory(docId)
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground italic py-12 text-center">{t.documentation.loading}</p>
+    return (
+      <p className="text-sm text-muted-foreground italic py-12 text-center">
+        {t.documentation.loading}
+      </p>
+    )
   }
 
   if (error) {
@@ -61,7 +65,11 @@ export function HistoryList({ docId }: HistoryListProps) {
                 <p className="text-xs text-muted-foreground">
                   {t.documentation.scrapedAt} {new Date(v.scraped_at).toLocaleDateString()}
                   {v.archived_at && (
-                    <> &middot; {t.documentation.archivedAt} {new Date(v.archived_at).toLocaleDateString()}</>
+                    <>
+                      {" "}
+                      &middot; {t.documentation.archivedAt}{" "}
+                      {new Date(v.archived_at).toLocaleDateString()}
+                    </>
                   )}
                 </p>
               </div>

@@ -7,7 +7,9 @@ export function ScrapList() {
   const { repos, loading, error, subscribe, unsubscribe } = useScrap()
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground italic py-12 text-center">{t.scrap.loading}</p>
+    return (
+      <p className="text-sm text-muted-foreground italic py-12 text-center">{t.scrap.loading}</p>
+    )
   }
 
   if (error) {
@@ -15,7 +17,9 @@ export function ScrapList() {
   }
 
   if (repos.length === 0) {
-    return <p className="text-sm text-muted-foreground italic py-12 text-center">{t.scrap.noContent}</p>
+    return (
+      <p className="text-sm text-muted-foreground italic py-12 text-center">{t.scrap.noContent}</p>
+    )
   }
 
   return (

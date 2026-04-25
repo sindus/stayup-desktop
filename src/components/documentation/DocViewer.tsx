@@ -13,7 +13,11 @@ export function DocViewer({ docId }: DocViewerProps) {
   const { doc, current, loading, error } = useDocContent(docId)
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground italic py-12 text-center">{t.documentation.loading}</p>
+    return (
+      <p className="text-sm text-muted-foreground italic py-12 text-center">
+        {t.documentation.loading}
+      </p>
+    )
   }
 
   if (error) {

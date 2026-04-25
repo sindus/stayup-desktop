@@ -9,7 +9,11 @@ export function DocList() {
   const { docs, loading, error, subscribe, unsubscribe } = useDocumentation()
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground italic py-12 text-center">{t.documentation.loading}</p>
+    return (
+      <p className="text-sm text-muted-foreground italic py-12 text-center">
+        {t.documentation.loading}
+      </p>
+    )
   }
 
   if (error) {
@@ -17,7 +21,11 @@ export function DocList() {
   }
 
   if (docs.length === 0) {
-    return <p className="text-sm text-muted-foreground italic py-12 text-center">{t.documentation.noContent}</p>
+    return (
+      <p className="text-sm text-muted-foreground italic py-12 text-center">
+        {t.documentation.noContent}
+      </p>
+    )
   }
 
   return (

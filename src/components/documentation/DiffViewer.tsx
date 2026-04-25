@@ -22,7 +22,11 @@ export function DiffViewer({ docId, versionId }: DiffViewerProps) {
   const { docName, version, diff, scraped_at, loading, error } = useDocDiff(docId, versionId)
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground italic py-12 text-center">{t.documentation.loading}</p>
+    return (
+      <p className="text-sm text-muted-foreground italic py-12 text-center">
+        {t.documentation.loading}
+      </p>
+    )
   }
 
   if (error) {
@@ -47,7 +51,10 @@ export function DiffViewer({ docId, versionId }: DiffViewerProps) {
           <p className="text-xs text-muted-foreground">
             {t.documentation.version} {version}
             {scraped_at && (
-              <> &middot; {t.documentation.scrapedAt} {new Date(scraped_at).toLocaleDateString()}</>
+              <>
+                {" "}
+                &middot; {t.documentation.scrapedAt} {new Date(scraped_at).toLocaleDateString()}
+              </>
             )}
           </p>
         </div>
