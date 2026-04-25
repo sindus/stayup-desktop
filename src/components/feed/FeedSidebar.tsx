@@ -7,6 +7,8 @@ import {
   ChevronDown,
   ChevronRight,
   LayoutList,
+  BookOpen,
+  MonitorDot,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useNavigationStore } from "@/store/navigation"
@@ -48,22 +50,58 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
     setExpanded((prev) => ({ ...prev, [provider]: !isExpanded(provider) }))
   }
 
-  const isAllActive = selection.type === "all"
+  const isDocActive =
+    selection.type === "documentation" ||
+    selection.type === "doc" ||
+    selection.type === "doc-history" ||
+    selection.type === "doc-diff"
 
   return (
     <aside className="w-56 shrink-0 border-r pr-4 overflow-y-auto">
-      <div className="mb-4">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          {t.feed.myFeeds}
-        </span>
-      </div>
-
       <nav className="space-y-0.5">
+        <div className="mb-2">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {t.documentation.myDocs}
+          </span>
+        </div>
+
+        <button
+          onClick={() => setSelection({ type: "documentation" })}
+          className={cn(
+            "flex w-full items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors",
+            isDocActive
+              ? "bg-accent text-accent-foreground font-medium"
+              : "text-foreground hover:bg-muted",
+          )}
+        >
+          <BookOpen className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{t.documentation.myDocs}</span>
+        </button>
+
+        <button
+          onClick={() => setSelection({ type: "scrap" })}
+          className={cn(
+            "flex w-full items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors",
+            selection.type === "scrap"
+              ? "bg-accent text-accent-foreground font-medium"
+              : "text-foreground hover:bg-muted",
+          )}
+        >
+          <MonitorDot className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{t.scrap.myScrap}</span>
+        </button>
+
+        <div className="mt-4 mb-2">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {t.feed.myFeeds}
+          </span>
+        </div>
+
         <button
           onClick={() => setSelection({ type: "all" })}
           className={cn(
             "flex w-full items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors",
-            isAllActive
+            selection.type === "all"
               ? "bg-accent text-accent-foreground font-medium"
               : "text-foreground hover:bg-muted",
           )}

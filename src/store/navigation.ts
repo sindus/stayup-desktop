@@ -5,6 +5,11 @@ export type NavSelection =
   | { type: "all" }
   | { type: "category"; provider: Provider }
   | { type: "flux"; fluxId: string; provider: Provider }
+  | { type: "scrap" }
+  | { type: "documentation" }
+  | { type: "doc"; docId: number }
+  | { type: "doc-history"; docId: number }
+  | { type: "doc-diff"; docId: number; versionId: number }
 
 interface NavigationState {
   selection: NavSelection

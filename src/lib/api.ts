@@ -1,4 +1,4 @@
-import type { Provider } from "@/types"
+import type { DocContent, DocRegistry, DocVersion, Provider, ScrapRepository } from "@/types"
 
 export interface UserRepositoryItem {
   id: string
@@ -77,4 +77,96 @@ export async function getUserFeed(
   apiUrl: string,
 ): Promise<UserFeedResponse> {
   return apiFetch<UserFeedResponse>(`/ui/users/${userId}/feed`, token, apiUrl)
+}
+
+// ─── Documentation ─────────────────────────────────────────────────────────────
+
+export async function getDocs(token: string, apiUrl: string): Promise<DocRegistry[]> {
+  const data = await apiFetch<{ docs: DocRegistry[] }>("/documentation", token, apiUrl)
+  return data.docs
+}
+
+export async function getDocContent(
+  docId: number,
+  token: string,
+  apiUrl: string,
+): Promise<{ doc: DocRegistry; current: DocContent | null }> {
+  return apiFetch<{ doc: DocRegistry; current: DocContent | null }>(
+    `/documentation/${docId}`,
+    token,
+    apiUrl,
+  )
+}
+
+export async function getDocHistory(
+  docId: number,
+  token: string,
+  apiUrl: string,
+): Promise<DocVersion[]> {
+  const data = await apiFetch<{ versions: DocVersion[] }>(
+    `/documentation/${docId}/history`,
+    token,
+    apiUrl,
+  )
+  return data.versions
+}
+
+export async function getDocDiff(
+  docId: number,
+  versionId: number,
+  token: string,
+  apiUrl: string,
+): Promise<{ version: number; diff: string; scraped_at: string }> {
+  return apiFetch<{ version: number; diff: string; scraped_at: string }>(
+    `/documentation/${docId}/diff/${versionId}`,
+    token,
+    apiUrl,
+  )
+}
+
+export async function subscribeDoc(
+  docId: number,
+  token: string,
+  apiUrl: string,
+): Promise<void> {
+  await apiFetch<{ success: boolean }>(`/documentation/${docId}/subscribe`, token, apiUrl, {
+    method: "POST",
+  })
+}
+
+export async function unsubscribeDoc(
+  docId: number,
+  token: string,
+  apiUrl: string,
+): Promise<void> {
+  await apiFetch<{ success: boolean }>(`/documentation/${docId}/subscribe`, token, apiUrl, {
+    method: "DELETE",
+  })
+}
+
+// ─── Scrap ──────────────────────────────────────────────────────────────────────
+
+export async function getScrapRepos(token: string, apiUrl: string): Promise<ScrapRepository[]> {
+  const data = await apiFetch<{ repos: ScrapRepository[] }>("/scrap", token, apiUrl)
+  return data.repos
+}
+
+export async function subscribeScrap(
+  repoId: number,
+  token: string,
+  apiUrl: string,
+): Promise<void> {
+  await apiFetch<{ success: boolean }>(`/scrap/${repoId}/subscribe`, token, apiUrl, {
+    method: "POST",
+  })
+}
+
+export async function unsubscribeScrap(
+  repoId: number,
+  token: string,
+  apiUrl: string,
+): Promise<void> {
+  await apiFetch<{ success: boolean }>(`/scrap/${repoId}/subscribe`, token, apiUrl, {
+    method: "DELETE",
+  })
 }

@@ -7,6 +7,11 @@ import { useTheme } from "@/context/ThemeContext"
 import { FeedSidebar } from "./FeedSidebar"
 import { FeedItemList } from "./FeedItemList"
 import { UnifiedFeedList } from "./UnifiedFeedList"
+import { DocList } from "@/components/documentation/DocList"
+import { DocViewer } from "@/components/documentation/DocViewer"
+import { HistoryList } from "@/components/documentation/HistoryList"
+import { DiffViewer } from "@/components/documentation/DiffViewer"
+import { ScrapList } from "@/components/feed/ScrapList"
 import { UserMenu } from "@/components/layout/UserMenu"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import type { AppSession } from "@/lib/session"
@@ -41,6 +46,13 @@ export function FeedLayout({ session, onLogout, onCheckUpdates }: FeedLayoutProp
   }))
 
   function renderContent() {
+    if (selection.type === "scrap") return <ScrapList />
+    if (selection.type === "documentation") return <DocList />
+    if (selection.type === "doc") return <DocViewer docId={selection.docId} />
+    if (selection.type === "doc-history") return <HistoryList docId={selection.docId} />
+    if (selection.type === "doc-diff")
+      return <DiffViewer docId={selection.docId} versionId={selection.versionId} />
+
     if (loading) {
       return (
         <p className="text-sm text-muted-foreground italic py-12 text-center">{t.feed.loading}</p>
