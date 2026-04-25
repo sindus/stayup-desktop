@@ -6,25 +6,43 @@ export type UpdateStatus =
   | "idle"
   | "checking"
   | "up-to-date"
-  | "available"
   | "downloading"
   | "restarting"
   | "error"
 
 export function useUpdater() {
   const [status, setStatus] = useState<UpdateStatus>("idle")
+  const [downloadProgress, setDownloadProgress] = useState<number | null>(null)
 
   const checkForUpdates = useCallback(async () => {
     setStatus("checking")
+    setDownloadProgress(null)
     try {
       const update = await check()
       if (!update) {
         setStatus("up-to-date")
         return
       }
-      setStatus("available")
+
       setStatus("downloading")
-      await update.downloadAndInstall()
+      let totalBytes: number | undefined
+      let downloaded = 0
+
+      await update.downloadAndInstall((event) => {
+        if (event.event === "Started") {
+          totalBytes = event.data.contentLength
+          downloaded = 0
+          setDownloadProgress(0)
+        } else if (event.event === "Progress") {
+          downloaded += event.data.chunkLength
+          if (totalBytes) {
+            setDownloadProgress(Math.round((downloaded / totalBytes) * 100))
+          }
+        } else if (event.event === "Finished") {
+          setDownloadProgress(100)
+        }
+      })
+
       setStatus("restarting")
       await relaunch()
     } catch {
@@ -32,7 +50,10 @@ export function useUpdater() {
     }
   }, [])
 
-  const dismiss = useCallback(() => setStatus("idle"), [])
+  const dismiss = useCallback(() => {
+    setStatus("idle")
+    setDownloadProgress(null)
+  }, [])
 
-  return { status, checkForUpdates, dismiss }
+  return { status, downloadProgress, checkForUpdates, dismiss }
 }

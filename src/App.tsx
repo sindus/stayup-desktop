@@ -7,7 +7,7 @@ import { UpdateBanner } from "@/components/ui/UpdateBanner"
 
 export default function App() {
   const { session, loading, error, login, loginOAuth, logout } = useAuth()
-  const { status: updateStatus, checkForUpdates, dismiss: dismissUpdate } = useUpdater()
+  const { status: updateStatus, downloadProgress, checkForUpdates, dismiss: dismissUpdate } = useUpdater()
   const { t } = useLanguage()
 
   if (loading) {
@@ -24,7 +24,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen">
-      <UpdateBanner status={updateStatus} t={t} onDismiss={dismissUpdate} />
+      <UpdateBanner status={updateStatus} downloadProgress={downloadProgress} t={t} onDismiss={dismissUpdate} />
       <FeedLayout session={session} onLogout={logout} onCheckUpdates={checkForUpdates} />
     </div>
   )
