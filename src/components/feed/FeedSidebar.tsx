@@ -1,9 +1,5 @@
 import { useState } from "react"
 import {
-  GitBranch,
-  PlaySquare,
-  Rss,
-  Globe,
   ChevronDown,
   ChevronRight,
   LayoutList,
@@ -20,6 +16,60 @@ import { readToken, readApiUrl } from "@/lib/store"
 import type { FeedFlux } from "@/hooks/useFeed"
 import type { Provider } from "@/types"
 
+const PROVIDER_META: Record<
+  Provider,
+  { label: string; color: string; dimColor: string; icon: React.ReactNode }
+> = {
+  changelog: {
+    label: 'GitHub Changelog',
+    color: 'var(--teal)',
+    dimColor: 'var(--teal-dim)',
+    icon: (
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1L9.5 4H11.5L7 1ZM7 1L4.5 4H2.5L7 1Z" fill="currentColor" opacity="0.8"/>
+        <rect x="2" y="4" width="10" height="1" rx="0.5" fill="currentColor"/>
+        <rect x="3" y="6.5" width="8" height="1" rx="0.5" fill="currentColor" opacity="0.5"/>
+        <rect x="3" y="8.5" width="6" height="1" rx="0.5" fill="currentColor" opacity="0.5"/>
+      </svg>
+    ),
+  },
+  youtube: {
+    label: 'YouTube',
+    color: 'var(--rose)',
+    dimColor: 'var(--rose-dim)',
+    icon: (
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+        <rect x="1" y="3" width="12" height="8" rx="2" fill="currentColor"/>
+        <path d="M5.5 5.5L9 7L5.5 8.5V5.5Z" fill="white"/>
+      </svg>
+    ),
+  },
+  rss: {
+    label: 'RSS',
+    color: 'var(--amber)',
+    dimColor: 'var(--amber-dim)',
+    icon: (
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+        <circle cx="3" cy="11" r="1.5" fill="currentColor"/>
+        <path d="M2 7.5C5 7.5 6.5 9 6.5 11.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <path d="M2 4C7 4 10 7 10 12" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  scrap: {
+    label: 'Web Scraping',
+    color: 'var(--green)',
+    dimColor: 'var(--green-dim)',
+    icon: (
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+        <ellipse cx="7" cy="7" rx="2" ry="5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+        <line x1="2" y1="7" x2="12" y2="7" stroke="currentColor" strokeWidth="1.2"/>
+      </svg>
+    ),
+  },
+}
+
 interface FeedSidebarProps {
   fluxes: FeedFlux[]
   userId: string
@@ -32,16 +82,6 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [addOpen, setAddOpen] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
-
-  const providerConfig: Record<
-    Provider,
-    { label: string; icon: React.ComponentType<{ className?: string }> }
-  > = {
-    changelog: { label: t.feed.providers.changelog, icon: GitBranch },
-    youtube: { label: t.feed.providers.youtube, icon: PlaySquare },
-    rss: { label: t.feed.providers.rss, icon: Rss },
-    scrap: { label: t.feed.providers.scrap, icon: Globe },
-  }
 
   const byProvider = fluxes.reduce<Partial<Record<Provider, FeedFlux[]>>>((acc, flux) => {
     ;(acc[flux.provider] ??= []).push(flux)
@@ -79,131 +119,151 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
     selection.type === "doc-diff"
 
   return (
-    <aside className="w-56 shrink-0 border-r pr-4 overflow-y-auto">
-      <nav className="space-y-0.5">
-        <div className="mb-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            {t.documentation.myDocs}
-          </span>
-        </div>
+    <aside
+      className="w-[220px] shrink-0 overflow-y-auto"
+      style={{ borderRight: '1px solid hsl(var(--border))' }}
+    >
+      <div className="px-3 pt-2">
+        {/* All feed */}
+        <button
+          onClick={() => setSelection({ type: "all" })}
+          className={cn(
+            "flex w-full items-center gap-2 px-2 py-1.5 rounded-md text-[13px] transition-colors mb-1",
+            selection.type === "all"
+              ? "text-foreground font-medium"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+          style={selection.type === "all" ? { background: 'var(--surface-3)' } : undefined}
+        >
+          <LayoutList className="h-3.5 w-3.5 shrink-0" />
+          <span>{t.feed.allFeeds}</span>
+        </button>
 
+        {/* Documentation */}
         <button
           onClick={() => setSelection({ type: "documentation" })}
           className={cn(
-            "flex w-full items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors",
+            "flex w-full items-center gap-2 px-2 py-1.5 rounded-md text-[13px] transition-colors mb-3",
             isDocActive
-              ? "bg-accent text-accent-foreground font-medium"
-              : "text-foreground hover:bg-muted",
+              ? "text-foreground font-medium"
+              : "text-muted-foreground hover:text-foreground",
           )}
+          style={isDocActive ? { background: 'var(--surface-3)' } : undefined}
         >
           <BookOpen className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{t.documentation.myDocs}</span>
+          <span>{t.documentation.myDocs}</span>
         </button>
 
-        <div className="mt-4 mb-2 flex items-center justify-between">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        {/* My feeds section */}
+        <div className="flex items-center justify-between mb-2 px-2">
+          <span
+            className="text-[10px] font-mono font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--dim)' }}
+          >
             {t.feed.myFeeds}
           </span>
           <button
             onClick={() => setAddOpen(true)}
-            className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="w-5 h-5 flex items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors"
+            style={{ border: '1px solid hsl(var(--border))' }}
             aria-label={t.addFlux.title}
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-3 w-3" />
           </button>
         </div>
 
-        <button
-          onClick={() => setSelection({ type: "all" })}
-          className={cn(
-            "flex w-full items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors",
-            selection.type === "all"
-              ? "bg-accent text-accent-foreground font-medium"
-              : "text-foreground hover:bg-muted",
-          )}
-        >
-          <LayoutList className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{t.feed.allFeeds}</span>
-        </button>
+        {/* Provider groups */}
+        <nav className="space-y-0.5">
+          {providers.map((provider) => {
+            const meta = PROVIDER_META[provider]
+            const isCategoryActive = selection.type === "category" && selection.provider === provider
+            const open = isExpanded(provider)
+            const count = byProvider[provider]?.length ?? 0
 
-        {providers.map((provider) => {
-          const { label, icon: Icon } = providerConfig[provider]
-          const isCategoryActive = selection.type === "category" && selection.provider === provider
-          const open = isExpanded(provider)
-
-          return (
-            <div key={provider}>
-              <div className="flex items-center gap-0.5">
-                <button
-                  onClick={() => toggleExpanded(provider)}
-                  className="p-1 text-muted-foreground hover:text-foreground rounded"
-                >
-                  {open ? (
-                    <ChevronDown className="h-3 w-3" />
-                  ) : (
-                    <ChevronRight className="h-3 w-3" />
-                  )}
-                </button>
-                <button
-                  onClick={() => setSelection({ type: "category", provider })}
-                  className={cn(
-                    "flex flex-1 items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors",
-                    isCategoryActive
-                      ? "bg-accent text-accent-foreground font-medium"
-                      : "text-foreground hover:bg-muted",
-                  )}
-                >
-                  <Icon className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">{label}</span>
-                </button>
-              </div>
-
-              {open && (
-                <div className="ml-7 mt-0.5 space-y-0.5 mb-1">
-                  {(byProvider[provider] ?? []).map((flux) => {
-                    const isActive = selection.type === "flux" && selection.fluxId === flux.id
-                    return (
-                      <div
-                        key={flux.id}
-                        className={cn(
-                          "group flex items-center rounded-md transition-colors",
-                          isActive ? "bg-accent" : "hover:bg-muted",
-                        )}
-                      >
-                        <button
-                          onClick={() =>
-                            setSelection({
-                              type: "flux",
-                              fluxId: flux.id,
-                              provider: flux.provider,
-                            })
-                          }
-                          className={cn(
-                            "flex-1 truncate px-2 py-1 text-sm text-left",
-                            isActive
-                              ? "text-accent-foreground font-medium"
-                              : "text-muted-foreground hover:text-foreground",
-                          )}
-                        >
-                          {flux.identifier}
-                        </button>
-                        <button
-                          onClick={(e) => handleDelete(flux, e)}
-                          disabled={deleting === flux.id}
-                          className="shrink-0 p-1 mr-1 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity disabled:opacity-50"
-                          aria-label="Supprimer ce flux"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </button>
-                      </div>
-                    )
-                  })}
+            return (
+              <div key={provider}>
+                <div className="flex items-center gap-0.5">
+                  <button
+                    onClick={() => toggleExpanded(provider)}
+                    className="p-1 text-muted-foreground hover:text-foreground rounded transition-colors"
+                  >
+                    {open ? (
+                      <ChevronDown className="h-3 w-3" />
+                    ) : (
+                      <ChevronRight className="h-3 w-3" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setSelection({ type: "category", provider })}
+                    className={cn(
+                      "flex flex-1 items-center gap-2 px-2 py-1.5 text-[13px] rounded-md transition-colors",
+                      isCategoryActive
+                        ? "text-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                    style={isCategoryActive ? { background: 'var(--surface-3)' } : undefined}
+                  >
+                    <span style={{ color: meta.color }}>{meta.icon}</span>
+                    <span className="truncate flex-1">{meta.label}</span>
+                    <span
+                      className="text-[10px] font-mono px-1.5 py-0.5 rounded-full shrink-0"
+                      style={{ background: meta.dimColor, color: meta.color }}
+                    >
+                      {count}
+                    </span>
+                  </button>
                 </div>
-              )}
-            </div>
-          )
-        })}
-      </nav>
+
+                {open && (
+                  <div className="ml-7 mt-0.5 space-y-0.5 mb-1">
+                    {(byProvider[provider] ?? []).map((flux) => {
+                      const isActive = selection.type === "flux" && selection.fluxId === flux.id
+                      return (
+                        <div
+                          key={flux.id}
+                          className={cn(
+                            "group flex items-center rounded-md transition-colors",
+                            isActive ? "" : "hover:bg-accent",
+                          )}
+                          style={isActive ? { background: 'var(--surface-3)' } : undefined}
+                        >
+                          {isActive && (
+                            <div
+                              className="w-0.5 h-4 rounded-full mr-1 shrink-0"
+                              style={{ background: meta.color }}
+                            />
+                          )}
+                          <button
+                            onClick={() =>
+                              setSelection({ type: "flux", fluxId: flux.id, provider: flux.provider })
+                            }
+                            className={cn(
+                              "flex-1 truncate px-2 py-1 text-[12px] font-mono text-left",
+                              isActive
+                                ? "text-foreground font-medium"
+                                : "text-muted-foreground hover:text-foreground",
+                            )}
+                          >
+                            {flux.identifier}
+                          </button>
+                          <button
+                            onClick={(e) => handleDelete(flux, e)}
+                            disabled={deleting === flux.id}
+                            className="shrink-0 p-1 mr-1 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity disabled:opacity-50"
+                            aria-label="Supprimer ce flux"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </nav>
+      </div>
 
       <AddFluxDialog
         open={addOpen}
