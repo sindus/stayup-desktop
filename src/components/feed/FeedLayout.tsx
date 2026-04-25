@@ -11,7 +11,6 @@ import { DocList } from "@/components/documentation/DocList"
 import { DocViewer } from "@/components/documentation/DocViewer"
 import { HistoryList } from "@/components/documentation/HistoryList"
 import { DiffViewer } from "@/components/documentation/DiffViewer"
-import { ScrapList } from "@/components/feed/ScrapList"
 import { UserMenu } from "@/components/layout/UserMenu"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import type { AppSession } from "@/lib/session"
@@ -46,7 +45,6 @@ export function FeedLayout({ session, onLogout, onCheckUpdates }: FeedLayoutProp
   }))
 
   function renderContent() {
-    if (selection.type === "scrap") return <ScrapList />
     if (selection.type === "documentation") return <DocList />
     if (selection.type === "doc") return <DocViewer docId={selection.docId} />
     if (selection.type === "doc-history") return <HistoryList docId={selection.docId} />
@@ -129,7 +127,7 @@ export function FeedLayout({ session, onLogout, onCheckUpdates }: FeedLayoutProp
       </header>
 
       <div className="flex flex-1 overflow-hidden px-6 py-4 gap-6">
-        <FeedSidebar fluxes={fluxes} />
+        <FeedSidebar fluxes={fluxes} userId={session.userId} onRefresh={stableRefresh} />
         <main className="flex-1 overflow-y-auto">{renderContent()}</main>
       </div>
     </div>

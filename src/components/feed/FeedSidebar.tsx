@@ -8,22 +8,26 @@ import {
   ChevronRight,
   LayoutList,
   BookOpen,
-  MonitorDot,
+  Plus,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useNavigationStore } from "@/store/navigation"
 import { useLanguage } from "@/context/LanguageContext"
+import { AddFluxDialog } from "./AddFluxDialog"
 import type { FeedFlux } from "@/hooks/useFeed"
 import type { Provider } from "@/types"
 
 interface FeedSidebarProps {
   fluxes: FeedFlux[]
+  userId: string
+  onRefresh: () => void
 }
 
-export function FeedSidebar({ fluxes }: FeedSidebarProps) {
+export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
   const { selection, setSelection } = useNavigationStore()
   const { t } = useLanguage()
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const [addOpen, setAddOpen] = useState(false)
 
   const providerConfig: Record<
     Provider,
@@ -78,23 +82,17 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
           <span className="truncate">{t.documentation.myDocs}</span>
         </button>
 
-        <button
-          onClick={() => setSelection({ type: "scrap" })}
-          className={cn(
-            "flex w-full items-center gap-2 px-2 py-1.5 text-sm rounded-md transition-colors",
-            selection.type === "scrap"
-              ? "bg-accent text-accent-foreground font-medium"
-              : "text-foreground hover:bg-muted",
-          )}
-        >
-          <MonitorDot className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{t.scrap.myScrap}</span>
-        </button>
-
-        <div className="mt-4 mb-2">
+        <div className="mt-4 mb-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             {t.feed.myFeeds}
           </span>
+          <button
+            onClick={() => setAddOpen(true)}
+            className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label={t.addFlux.title}
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </button>
         </div>
 
         <button
@@ -173,6 +171,13 @@ export function FeedSidebar({ fluxes }: FeedSidebarProps) {
           )
         })}
       </nav>
+
+      <AddFluxDialog
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        userId={userId}
+        onSuccess={onRefresh}
+      />
     </aside>
   )
 }

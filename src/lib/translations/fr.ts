@@ -23,12 +23,28 @@ export const fr = {
       scrap: "Scraping web",
     },
   },
-  scrap: {
-    myScrap: "Scraping web",
+  addFlux: {
+    title: "Ajouter un flux",
+    provider: "Provider",
+    identifierLabels: {
+      changelog: "Dépôt GitHub",
+      youtube: "Chaîne YouTube",
+      rss: "URL du flux RSS",
+    },
+    placeholders: {
+      changelog: "ex: facebook/react",
+      youtube: "ex: fireship",
+      rss: "ex: https://example.com/feed.xml",
+    },
+    scrapRepo: "Flux disponible",
+    selectScrapRepo: "Sélectionner un flux",
+    noScrapRepos: "Aucun flux disponible",
+    cancel: "Annuler",
+    add: "Ajouter",
+    adding: "Ajout…",
+    requiredError: "Ce champ est requis",
+    selectError: "Sélectionnez un flux",
     loading: "Chargement…",
-    subscribe: "Suivre",
-    unsubscribe: "Ne plus suivre",
-    noContent: "Aucun flux scraping disponible.",
   },
   documentation: {
     myDocs: "Documentation",

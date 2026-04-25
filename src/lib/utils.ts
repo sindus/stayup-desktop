@@ -37,6 +37,35 @@ export function extractIdentifier(url: string, provider: Provider): string {
   }
 }
 
+export function normalizeIdentifier(value: string, provider: Provider): string {
+  const trimmed = value.trim()
+  if (provider === "changelog") {
+    const match = trimmed.match(/github\.com\/([^/]+\/[^/]+)/i)
+    if (match) return match[1].replace(/\.git$/, "").replace(/\/$/, "")
+    return trimmed
+      .replace(/^https?:\/\/github\.com\//, "")
+      .replace(/\.git$/, "")
+      .replace(/\/$/, "")
+  }
+  if (provider === "youtube") {
+    const match = trimmed.match(/youtube\.com\/(?:@|channel\/|user\/)([^/?\s]+)/i)
+    if (match) return match[1]
+    return trimmed.replace(/^@/, "")
+  }
+  return trimmed
+}
+
+export function toRepositoryUrl(identifier: string, provider: Provider): string {
+  switch (provider) {
+    case "changelog":
+      return `https://github.com/${identifier}/`
+    case "youtube":
+      return `https://www.youtube.com/@${identifier}`
+    default:
+      return identifier
+  }
+}
+
 export async function openUrl(url: string): Promise<void> {
   await open(url)
 }

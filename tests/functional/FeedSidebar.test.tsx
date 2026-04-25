@@ -39,25 +39,25 @@ beforeEach(() => {
 
 describe("FeedSidebar", () => {
   it("renders the 'Tous les flux' button", () => {
-    renderWithLang(<FeedSidebar fluxes={fluxes} />)
+    renderWithLang(<FeedSidebar fluxes={fluxes} userId="user-1" onRefresh={() => {}} />)
     expect(screen.getByText("Tous les flux")).toBeInTheDocument()
   })
 
   it("renders one entry per provider group", () => {
-    renderWithLang(<FeedSidebar fluxes={fluxes} />)
+    renderWithLang(<FeedSidebar fluxes={fluxes} userId="user-1" onRefresh={() => {}} />)
     expect(screen.getByText("GitHub Changelog")).toBeInTheDocument()
     expect(screen.getByText("YouTube")).toBeInTheDocument()
   })
 
   it("shows flux identifiers when a category is expanded (default)", () => {
-    renderWithLang(<FeedSidebar fluxes={fluxes} />)
+    renderWithLang(<FeedSidebar fluxes={fluxes} userId="user-1" onRefresh={() => {}} />)
     expect(screen.getByText("facebook/react")).toBeInTheDocument()
     expect(screen.getByText("@fireship")).toBeInTheDocument()
     expect(screen.getByText("@theo")).toBeInTheDocument()
   })
 
   it("collapses a category when its chevron is clicked", () => {
-    renderWithLang(<FeedSidebar fluxes={fluxes} />)
+    renderWithLang(<FeedSidebar fluxes={fluxes} userId="user-1" onRefresh={() => {}} />)
 
     const buttons = screen.getAllByRole("button")
     const chevronButtons = buttons.filter((b) => b.textContent?.trim() === "")
@@ -71,13 +71,13 @@ describe("FeedSidebar", () => {
 
   it("dispatches 'all' selection on 'Tous les flux' click", () => {
     useNavigationStore.setState({ selection: { type: "category", provider: "youtube" } })
-    renderWithLang(<FeedSidebar fluxes={fluxes} />)
+    renderWithLang(<FeedSidebar fluxes={fluxes} userId="user-1" onRefresh={() => {}} />)
     fireEvent.click(screen.getByText("Tous les flux"))
     expect(useNavigationStore.getState().selection).toEqual({ type: "all" })
   })
 
   it("dispatches a category selection when clicking a provider label", () => {
-    renderWithLang(<FeedSidebar fluxes={fluxes} />)
+    renderWithLang(<FeedSidebar fluxes={fluxes} userId="user-1" onRefresh={() => {}} />)
     fireEvent.click(screen.getByText("YouTube"))
     expect(useNavigationStore.getState().selection).toEqual({
       type: "category",
@@ -86,7 +86,7 @@ describe("FeedSidebar", () => {
   })
 
   it("dispatches a flux selection when clicking a specific flux", () => {
-    renderWithLang(<FeedSidebar fluxes={fluxes} />)
+    renderWithLang(<FeedSidebar fluxes={fluxes} userId="user-1" onRefresh={() => {}} />)
     fireEvent.click(screen.getByText("facebook/react"))
     expect(useNavigationStore.getState().selection).toEqual({
       type: "flux",
@@ -96,7 +96,7 @@ describe("FeedSidebar", () => {
   })
 
   it("renders an empty sidebar without errors when there are no fluxes", () => {
-    renderWithLang(<FeedSidebar fluxes={[]} />)
+    renderWithLang(<FeedSidebar fluxes={[]} userId="user-1" onRefresh={() => {}} />)
     expect(screen.getByText("Tous les flux")).toBeInTheDocument()
     expect(screen.queryByText("GitHub Changelog")).not.toBeInTheDocument()
   })

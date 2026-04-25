@@ -79,6 +79,18 @@ export async function getUserFeed(
   return apiFetch<UserFeedResponse>(`/ui/users/${userId}/feed`, token, apiUrl)
 }
 
+export async function addUserRepository(
+  userId: string,
+  token: string,
+  apiUrl: string,
+  data: { provider: string; url: string; config: Record<string, unknown> },
+): Promise<void> {
+  await apiFetch(`/ui/users/${userId}/repositories`, token, apiUrl, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
 // ─── Documentation ─────────────────────────────────────────────────────────────
 
 export async function getDocs(token: string, apiUrl: string): Promise<DocRegistry[]> {

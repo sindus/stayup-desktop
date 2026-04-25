@@ -25,12 +25,28 @@ export const en: Translations = {
       scrap: "Web scraping",
     },
   },
-  scrap: {
-    myScrap: "Web scraping",
+  addFlux: {
+    title: "Add a feed",
+    provider: "Provider",
+    identifierLabels: {
+      changelog: "GitHub repository",
+      youtube: "YouTube channel",
+      rss: "RSS feed URL",
+    },
+    placeholders: {
+      changelog: "e.g. facebook/react",
+      youtube: "e.g. fireship",
+      rss: "e.g. https://example.com/feed.xml",
+    },
+    scrapRepo: "Available feed",
+    selectScrapRepo: "Select a feed",
+    noScrapRepos: "No feeds available",
+    cancel: "Cancel",
+    add: "Add",
+    adding: "Adding…",
+    requiredError: "This field is required",
+    selectError: "Select a feed",
     loading: "Loading…",
-    subscribe: "Follow",
-    unsubscribe: "Unfollow",
-    noContent: "No scraping feeds available.",
   },
   documentation: {
     myDocs: "Documentation",
