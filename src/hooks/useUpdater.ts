@@ -45,7 +45,8 @@ export function useUpdater() {
 
       setStatus("restarting")
       await relaunch()
-    } catch {
+    } catch (err) {
+      console.error("[updater] check failed:", err)
       setStatus("error")
     }
   }, [])
