@@ -9,7 +9,46 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create.outputs.releaseId }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Create draft release
+        id: create
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: StayUp ${{ github.ref_name }}
+          releaseBody: |
+            ## Téléchargements
+
+            | Plateforme | Fichier |
+            |---|---|
+            | macOS (Apple Silicon) | `StayUp_*_aarch64.dmg` |
+            | macOS (Intel) | `StayUp_*_x64.dmg` |
+            | Windows | `StayUp_*_x64-setup.exe` |
+            | Linux | `StayUp_*_amd64.AppImage` |
+
+            Voir les [assets ci-dessous](#) pour tous les installateurs.
+          releaseDraft: true
+          prerelease: false
+
+  build:
+    needs: create-release
     name: Build & publish (${{ matrix.platform }})
     strategy:
       fail-fast: false
@@ -61,26 +100,29 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Build & release
+      - name: Build & upload
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: StayUp ${{ github.ref_name }}
-          releaseBody: |
-            ## Téléchargements
-
-            | Plateforme | Fichier |
-            |---|---|
-            | macOS (Apple Silicon) | `StayUp_*_aarch64.dmg` |
-            | macOS (Intel) | `StayUp_*_x64.dmg` |
-            | Windows | `StayUp_*_x64-setup.exe` |
-            | Linux | `StayUp_*_amd64.AppImage` |
-
-            Voir les [assets ci-dessous](#) pour tous les installateurs.
-          releaseDraft: false
-          prerelease: false
+          releaseId: ${{ needs.create-release.outputs.release_id }}
           args: ${{ matrix.args }}
+
+  publish-release:
+    needs: [create-release, build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Publish release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: ${{ needs.create-release.outputs.release_id }},
+              draft: false,
+              prerelease: false
+            })
