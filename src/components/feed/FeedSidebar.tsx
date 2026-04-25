@@ -9,11 +9,14 @@ import {
   LayoutList,
   BookOpen,
   Plus,
+  Trash2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useNavigationStore } from "@/store/navigation"
 import { useLanguage } from "@/context/LanguageContext"
 import { AddFluxDialog } from "./AddFluxDialog"
+import { deleteUserRepository } from "@/lib/api"
+import { readToken, readApiUrl } from "@/lib/store"
 import type { FeedFlux } from "@/hooks/useFeed"
 import type { Provider } from "@/types"
 
@@ -28,6 +31,7 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
   const { t } = useLanguage()
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [addOpen, setAddOpen] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   const providerConfig: Record<
     Provider,
@@ -52,6 +56,20 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
 
   function toggleExpanded(provider: Provider) {
     setExpanded((prev) => ({ ...prev, [provider]: !isExpanded(provider) }))
+  }
+
+  async function handleDelete(flux: FeedFlux, e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!confirm(`Supprimer "${flux.identifier}" ?`)) return
+    setDeleting(flux.id)
+    try {
+      const [token, apiUrl] = await Promise.all([readToken(), readApiUrl()])
+      if (!token) throw new Error("Token manquant")
+      await deleteUserRepository(userId, flux.id, token, apiUrl)
+      onRefresh()
+    } finally {
+      setDeleting(null)
+    }
   }
 
   const isDocActive =
@@ -145,24 +163,39 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
                   {(byProvider[provider] ?? []).map((flux) => {
                     const isActive = selection.type === "flux" && selection.fluxId === flux.id
                     return (
-                      <button
+                      <div
                         key={flux.id}
-                        onClick={() =>
-                          setSelection({
-                            type: "flux",
-                            fluxId: flux.id,
-                            provider: flux.provider,
-                          })
-                        }
                         className={cn(
-                          "w-full truncate px-2 py-1 text-sm rounded-md transition-colors text-left",
-                          isActive
-                            ? "bg-accent text-accent-foreground font-medium"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                          "group flex items-center rounded-md transition-colors",
+                          isActive ? "bg-accent" : "hover:bg-muted",
                         )}
                       >
-                        {flux.identifier}
-                      </button>
+                        <button
+                          onClick={() =>
+                            setSelection({
+                              type: "flux",
+                              fluxId: flux.id,
+                              provider: flux.provider,
+                            })
+                          }
+                          className={cn(
+                            "flex-1 truncate px-2 py-1 text-sm text-left",
+                            isActive
+                              ? "text-accent-foreground font-medium"
+                              : "text-muted-foreground hover:text-foreground",
+                          )}
+                        >
+                          {flux.identifier}
+                        </button>
+                        <button
+                          onClick={(e) => handleDelete(flux, e)}
+                          disabled={deleting === flux.id}
+                          className="shrink-0 p-1 mr-1 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity disabled:opacity-50"
+                          aria-label="Supprimer ce flux"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </div>
                     )
                   })}
                 </div>

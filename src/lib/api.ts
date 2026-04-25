@@ -91,6 +91,17 @@ export async function addUserRepository(
   })
 }
 
+export async function deleteUserRepository(
+  userId: string,
+  linkId: string,
+  token: string,
+  apiUrl: string,
+): Promise<void> {
+  await apiFetch(`/ui/users/${userId}/repositories/${linkId}`, token, apiUrl, {
+    method: "DELETE",
+  })
+}
+
 // ─── Documentation ─────────────────────────────────────────────────────────────
 
 export async function getDocs(token: string, apiUrl: string): Promise<DocRegistry[]> {
