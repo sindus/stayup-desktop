@@ -59,10 +59,11 @@ describe("FeedSidebar", () => {
   it("collapses a category when its chevron is clicked", () => {
     renderWithLang(<FeedSidebar fluxes={fluxes} userId="user-1" onRefresh={() => {}} />)
 
-    const buttons = screen.getAllByRole("button")
-    const chevronButtons = buttons.filter((b) => b.textContent?.trim() === "")
-    // chevronButtons[0] = "+" add button, chevronButtons[1] = changelog, chevronButtons[2] = youtube
-    fireEvent.click(chevronButtons[2])
+    const chevronButtons = screen
+      .getAllByRole("button")
+      .filter((b) => b.textContent?.trim() === "" && !b.getAttribute("aria-label"))
+    // chevronButtons[0] = changelog chevron, chevronButtons[1] = youtube chevron
+    fireEvent.click(chevronButtons[1])
 
     expect(screen.queryByText("@fireship")).not.toBeInTheDocument()
     expect(screen.queryByText("@theo")).not.toBeInTheDocument()
