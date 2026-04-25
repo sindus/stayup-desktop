@@ -25,7 +25,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDcxNEI5OEJCQUUwQkUyOEIKUldTTDRndXV1NWhMY1ladGhUck5CTFg2T0R4QnlDTzZleGZlWkhPYk83ekVFM3dxR0NjZDM1TXcK",
       "endpoints": [
         "https://github.com/sindus/stayup-desktop/releases/latest/download/latest.json"
       ]
