@@ -21,31 +21,38 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
   const [provider, setProvider] = useState<Provider>("changelog")
   const [identifier, setIdentifier] = useState("")
   const [scrapRepoId, setScrapRepoId] = useState("")
-  const [scrapRepos, setScrapRepos] = useState<ScrapRepository[]>([])
-  const [scrapLoading, setScrapLoading] = useState(false)
+  // null = not yet fetched, [] = fetched (possibly empty)
+  const [scrapRepos, setScrapRepos] = useState<ScrapRepository[] | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!open) return
+    if (provider !== "scrap") return
+    let cancelled = false
+    Promise.all([readToken(), readApiUrl()])
+      .then(([token, apiUrl]) => {
+        if (cancelled || !token) return []
+        return getScrapRepos(token, apiUrl)
+      })
+      .then((repos) => {
+        if (!cancelled) setScrapRepos(repos ?? [])
+      })
+      .catch(() => {
+        if (!cancelled) setScrapRepos([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [provider])
+
+  function handleClose() {
     setProvider("changelog")
     setIdentifier("")
     setScrapRepoId("")
+    setScrapRepos(null)
     setError(null)
-  }, [open])
-
-  useEffect(() => {
-    if (provider !== "scrap") return
-    setScrapLoading(true)
-    Promise.all([readToken(), readApiUrl()])
-      .then(([token, apiUrl]) => {
-        if (!token) return []
-        return getScrapRepos(token, apiUrl)
-      })
-      .then((repos) => setScrapRepos(repos))
-      .catch(() => setScrapRepos([]))
-      .finally(() => setScrapLoading(false))
-  }, [provider])
+    onClose()
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -81,7 +88,7 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
       }
 
       onSuccess()
-      onClose()
+      handleClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.")
     } finally {
@@ -91,11 +98,12 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
 
   if (!open) return null
 
-  const availableScrapRepos = scrapRepos.filter((r) => !r.is_subscribed)
+  const scrapLoading = provider === "scrap" && scrapRepos === null
+  const availableScrapRepos = (scrapRepos ?? []).filter((r) => !r.is_subscribed)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
       <div className="relative z-10 w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-lg">
         <h2 className="text-base font-semibold mb-1">{t.addFlux.title}</h2>
 
@@ -108,6 +116,7 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
                 setProvider(e.target.value as Provider)
                 setIdentifier("")
                 setScrapRepoId("")
+                setScrapRepos(null)
                 setError(null)
               }}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
@@ -165,7 +174,7 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2 text-sm rounded-md border border-border hover:bg-muted transition-colors"
             >
               {t.addFlux.cancel}
