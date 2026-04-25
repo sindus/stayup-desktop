@@ -12,40 +12,33 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     outputs:
-      release_id: ${{ steps.create.outputs.releaseId }}
+      release_id: ${{ steps.create.outputs.release_id }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install frontend dependencies
-        run: npm ci
-
       - name: Create draft release
         id: create
-        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: ${{ github.ref_name }}
-          releaseName: StayUp ${{ github.ref_name }}
-          releaseBody: |
-            ## Téléchargements
+        run: |
+          release_id=$(gh api repos/${{ github.repository }}/releases \
+            --method POST \
+            --field tag_name="${{ github.ref_name }}" \
+            --field name="StayUp ${{ github.ref_name }}" \
+            --field body="## Téléchargements
 
-            | Plateforme | Fichier |
-            |---|---|
-            | macOS (Apple Silicon) | `StayUp_*_aarch64.dmg` |
-            | macOS (Intel) | `StayUp_*_x64.dmg` |
-            | Windows | `StayUp_*_x64-setup.exe` |
-            | Linux | `StayUp_*_amd64.AppImage` |
+          | Plateforme | Fichier |
+          |---|---|
+          | macOS (Apple Silicon) | \`StayUp_*_aarch64.dmg\` |
+          | macOS (Intel) | \`StayUp_*_x64.dmg\` |
+          | Windows | \`StayUp_*_x64-setup.exe\` |
+          | Linux | \`StayUp_*_amd64.AppImage\` |
 
-            Voir les [assets ci-dessous](#) pour tous les installateurs.
-          releaseDraft: true
-          prerelease: false
+          Voir les assets ci-dessous pour tous les installateurs." \
+            --field draft=true \
+            --jq '.id')
+          echo "release_id=$release_id" >> $GITHUB_OUTPUT
 
   build:
     needs: create-release
@@ -116,13 +109,9 @@ jobs:
 
     steps:
       - name: Publish release
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.repos.updateRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: ${{ needs.create-release.outputs.release_id }},
-              draft: false,
-              prerelease: false
-            })
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/releases/${{ needs.create-release.outputs.release_id }} \
+            --method PATCH \
+            --field draft=false
