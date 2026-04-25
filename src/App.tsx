@@ -19,12 +19,12 @@ export default function App() {
     return (
       <div
         className="flex items-center justify-center h-screen"
-        style={{ background: 'hsl(var(--background))' }}
+        style={{ background: "hsl(var(--background))" }}
       >
         <div className="flex flex-col items-center gap-4">
           <svg width="32" height="32" viewBox="0 0 26 26" fill="none">
-            <rect width="26" height="26" rx="6" fill="var(--teal)"/>
-            <path d="M13 6L19.5 15H15V20H11V15H6.5L13 6Z" fill="#09090b"/>
+            <rect width="26" height="26" rx="6" fill="var(--teal)" />
+            <path d="M13 6L19.5 15H15V20H11V15H6.5L13 6Z" fill="#09090b" />
           </svg>
           <p className="text-[13px] text-muted-foreground font-mono">{t.feed.loading}</p>
         </div>

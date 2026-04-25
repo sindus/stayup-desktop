@@ -39,30 +39,42 @@ const PROVIDER_DIM: Record<Provider, string> = {
 const PROVIDER_ICONS: Record<Provider, React.ReactNode> = {
   changelog: (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <path d="M7 1L9.5 4H11.5L7 1ZM7 1L4.5 4H2.5L7 1Z" fill="currentColor" opacity="0.8"/>
-      <rect x="2" y="4" width="10" height="1" rx="0.5" fill="currentColor"/>
-      <rect x="3" y="6.5" width="8" height="1" rx="0.5" fill="currentColor" opacity="0.5"/>
-      <rect x="3" y="8.5" width="6" height="1" rx="0.5" fill="currentColor" opacity="0.5"/>
+      <path d="M7 1L9.5 4H11.5L7 1ZM7 1L4.5 4H2.5L7 1Z" fill="currentColor" opacity="0.8" />
+      <rect x="2" y="4" width="10" height="1" rx="0.5" fill="currentColor" />
+      <rect x="3" y="6.5" width="8" height="1" rx="0.5" fill="currentColor" opacity="0.5" />
+      <rect x="3" y="8.5" width="6" height="1" rx="0.5" fill="currentColor" opacity="0.5" />
     </svg>
   ),
   youtube: (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <rect x="1" y="3" width="12" height="8" rx="2" fill="currentColor"/>
-      <path d="M5.5 5.5L9 7L5.5 8.5V5.5Z" fill="white"/>
+      <rect x="1" y="3" width="12" height="8" rx="2" fill="currentColor" />
+      <path d="M5.5 5.5L9 7L5.5 8.5V5.5Z" fill="white" />
     </svg>
   ),
   rss: (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <circle cx="3" cy="11" r="1.5" fill="currentColor"/>
-      <path d="M2 7.5C5 7.5 6.5 9 6.5 11.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
-      <path d="M2 4C7 4 10 7 10 12" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+      <circle cx="3" cy="11" r="1.5" fill="currentColor" />
+      <path
+        d="M2 7.5C5 7.5 6.5 9 6.5 11.5"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M2 4C7 4 10 7 10 12"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        fill="none"
+        strokeLinecap="round"
+      />
     </svg>
   ),
   scrap: (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-      <ellipse cx="7" cy="7" rx="2" ry="5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-      <line x1="2" y1="7" x2="12" y2="7" stroke="currentColor" strokeWidth="1.2"/>
+      <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <ellipse cx="7" cy="7" rx="2" ry="5" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <line x1="2" y1="7" x2="12" y2="7" stroke="currentColor" strokeWidth="1.2" />
     </svg>
   ),
 }
@@ -104,7 +116,7 @@ export function UnifiedFeedList({
   )
 
   return (
-    <div className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
+    <div className="divide-y" style={{ borderColor: "var(--border-subtle)" }}>
       {sorted.map((tagged, i) => {
         const color = PROVIDER_COLORS[tagged.provider]
         const icon = PROVIDER_ICONS[tagged.provider]
@@ -112,8 +124,12 @@ export function UnifiedFeedList({
           <div
             key={i}
             className="flex gap-3 px-1 py-3 transition-colors rounded"
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = '' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--surface-2)"
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = ""
+            }}
           >
             <div className="mt-1 shrink-0" style={{ color }}>
               {icon}
@@ -127,9 +143,7 @@ export function UnifiedFeedList({
                   dimColor={PROVIDER_DIM[tagged.provider]}
                 />
               )}
-              {tagged.provider === "youtube" && (
-                <YoutubeEntry item={tagged.item} color={color} />
-              )}
+              {tagged.provider === "youtube" && <YoutubeEntry item={tagged.item} color={color} />}
               {tagged.provider === "rss" && <RssEntry item={tagged.item} />}
               {tagged.provider === "scrap" && <ScrapEntry item={tagged.item} />}
             </div>
@@ -154,7 +168,7 @@ function ChangelogEntry({
   const href = repoUrl ? `${repoUrl}/releases/tag/${item.version}` : undefined
 
   const content = (
-    <div className="pl-3 py-1" style={{ borderLeft: '2px solid hsl(var(--border))' }}>
+    <div className="pl-3 py-1" style={{ borderLeft: "2px solid hsl(var(--border))" }}>
       <div className="flex items-center justify-between gap-2 mb-1">
         <div className="flex items-center gap-2">
           <span className="text-[12px] font-mono text-muted-foreground truncate">
@@ -168,14 +182,17 @@ function ChangelogEntry({
           </span>
         </div>
         {item.datetime && (
-          <span className="text-[11px] font-mono shrink-0" style={{ color: 'var(--dim)' }}>
+          <span className="text-[11px] font-mono shrink-0" style={{ color: "var(--dim)" }}>
             {formatDate(item.datetime)}
           </span>
         )}
       </div>
       {item.content && (
         <p className="text-[13px] text-muted-foreground line-clamp-2 leading-relaxed">
-          {item.content.replace(/#{1,6}\s/g, "").replace(/\r\n/g, " ").slice(0, 200)}
+          {item.content
+            .replace(/#{1,6}\s/g, "")
+            .replace(/\r\n/g, " ")
+            .slice(0, 200)}
         </p>
       )}
     </div>
@@ -186,7 +203,10 @@ function ChangelogEntry({
   return (
     <a
       href={href}
-      onClick={(e) => { e.preventDefault(); void openUrl(href) }}
+      onClick={(e) => {
+        e.preventDefault()
+        void openUrl(href)
+      }}
       className="block cursor-pointer"
     >
       {content}
@@ -206,7 +226,7 @@ function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
     <div className="flex gap-3">
       <div
         className="w-24 h-[54px] rounded shrink-0 flex items-center justify-center overflow-hidden"
-        style={{ background: 'var(--surface-2)' }}
+        style={{ background: "var(--surface-2)" }}
       >
         {parsed?.thumbnail ? (
           <img
@@ -219,8 +239,16 @@ function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
           />
         ) : (
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ color }}>
-            <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.4"/>
-            <path d="M8 7L14 10L8 13V7Z" fill="currentColor"/>
+            <circle
+              cx="10"
+              cy="10"
+              r="9"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="none"
+              opacity="0.4"
+            />
+            <path d="M8 7L14 10L8 13V7Z" fill="currentColor" />
           </svg>
         )}
       </div>
@@ -241,7 +269,10 @@ function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
   return (
     <a
       href={videoUrl}
-      onClick={(e) => { e.preventDefault(); void openUrl(videoUrl) }}
+      onClick={(e) => {
+        e.preventDefault()
+        void openUrl(videoUrl)
+      }}
       className="block cursor-pointer"
     >
       {inner}
@@ -258,11 +289,13 @@ function RssEntry({ item }: { item: RssItem }) {
   }
 
   const inner = (
-    <div className="pl-3 py-1" style={{ borderLeft: '2px solid hsl(var(--border))' }}>
+    <div className="pl-3 py-1" style={{ borderLeft: "2px solid hsl(var(--border))" }}>
       <div className="flex items-center justify-between gap-2 mb-1">
-        <span className="text-[13.5px] font-medium line-clamp-1">{parsed?.title ?? "Sans titre"}</span>
+        <span className="text-[13.5px] font-medium line-clamp-1">
+          {parsed?.title ?? "Sans titre"}
+        </span>
         {item.datetime && (
-          <span className="text-[11px] font-mono shrink-0" style={{ color: 'var(--dim)' }}>
+          <span className="text-[11px] font-mono shrink-0" style={{ color: "var(--dim)" }}>
             {formatDate(item.datetime)}
           </span>
         )}
@@ -281,7 +314,10 @@ function RssEntry({ item }: { item: RssItem }) {
   return (
     <a
       href={link}
-      onClick={(e) => { e.preventDefault(); void openUrl(link) }}
+      onClick={(e) => {
+        e.preventDefault()
+        void openUrl(link)
+      }}
       className="block cursor-pointer"
     >
       {inner}
@@ -302,14 +338,14 @@ function ScrapEntry({ item }: { item: ScrapItem }) {
       : (item.params as ScrapItemParams | null)
 
   const inner = (
-    <div className="pl-3 py-1" style={{ borderLeft: '2px solid hsl(var(--border))' }}>
+    <div className="pl-3 py-1" style={{ borderLeft: "2px solid hsl(var(--border))" }}>
       <div className="flex items-center justify-between gap-2 mb-1">
         {params?.url && (
           <span className="text-[12px] font-mono text-muted-foreground line-clamp-1 truncate">
             {params.url}
           </span>
         )}
-        <span className="text-[11px] font-mono shrink-0" style={{ color: 'var(--dim)' }}>
+        <span className="text-[11px] font-mono shrink-0" style={{ color: "var(--dim)" }}>
           {formatDate(item.executed_at)}
         </span>
       </div>
@@ -327,7 +363,10 @@ function ScrapEntry({ item }: { item: ScrapItem }) {
   return (
     <a
       href={url}
-      onClick={(e) => { e.preventDefault(); void openUrl(url) }}
+      onClick={(e) => {
+        e.preventDefault()
+        void openUrl(url)
+      }}
       className="block cursor-pointer"
     >
       {inner}

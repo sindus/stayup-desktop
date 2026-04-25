@@ -1,12 +1,5 @@
 import { useState } from "react"
-import {
-  ChevronDown,
-  ChevronRight,
-  LayoutList,
-  BookOpen,
-  Plus,
-  Trash2,
-} from "lucide-react"
+import { ChevronDown, ChevronRight, LayoutList, BookOpen, Plus, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useNavigationStore } from "@/store/navigation"
 import { useLanguage } from "@/context/LanguageContext"
@@ -21,50 +14,62 @@ const PROVIDER_META: Record<
   { label: string; color: string; dimColor: string; icon: React.ReactNode }
 > = {
   changelog: {
-    label: 'GitHub Changelog',
-    color: 'var(--teal)',
-    dimColor: 'var(--teal-dim)',
+    label: "GitHub Changelog",
+    color: "var(--teal)",
+    dimColor: "var(--teal-dim)",
     icon: (
       <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-        <path d="M7 1L9.5 4H11.5L7 1ZM7 1L4.5 4H2.5L7 1Z" fill="currentColor" opacity="0.8"/>
-        <rect x="2" y="4" width="10" height="1" rx="0.5" fill="currentColor"/>
-        <rect x="3" y="6.5" width="8" height="1" rx="0.5" fill="currentColor" opacity="0.5"/>
-        <rect x="3" y="8.5" width="6" height="1" rx="0.5" fill="currentColor" opacity="0.5"/>
+        <path d="M7 1L9.5 4H11.5L7 1ZM7 1L4.5 4H2.5L7 1Z" fill="currentColor" opacity="0.8" />
+        <rect x="2" y="4" width="10" height="1" rx="0.5" fill="currentColor" />
+        <rect x="3" y="6.5" width="8" height="1" rx="0.5" fill="currentColor" opacity="0.5" />
+        <rect x="3" y="8.5" width="6" height="1" rx="0.5" fill="currentColor" opacity="0.5" />
       </svg>
     ),
   },
   youtube: {
-    label: 'YouTube',
-    color: 'var(--rose)',
-    dimColor: 'var(--rose-dim)',
+    label: "YouTube",
+    color: "var(--rose)",
+    dimColor: "var(--rose-dim)",
     icon: (
       <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-        <rect x="1" y="3" width="12" height="8" rx="2" fill="currentColor"/>
-        <path d="M5.5 5.5L9 7L5.5 8.5V5.5Z" fill="white"/>
+        <rect x="1" y="3" width="12" height="8" rx="2" fill="currentColor" />
+        <path d="M5.5 5.5L9 7L5.5 8.5V5.5Z" fill="white" />
       </svg>
     ),
   },
   rss: {
-    label: 'RSS',
-    color: 'var(--amber)',
-    dimColor: 'var(--amber-dim)',
+    label: "RSS",
+    color: "var(--amber)",
+    dimColor: "var(--amber-dim)",
     icon: (
       <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-        <circle cx="3" cy="11" r="1.5" fill="currentColor"/>
-        <path d="M2 7.5C5 7.5 6.5 9 6.5 11.5" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
-        <path d="M2 4C7 4 10 7 10 12" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+        <circle cx="3" cy="11" r="1.5" fill="currentColor" />
+        <path
+          d="M2 7.5C5 7.5 6.5 9 6.5 11.5"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path
+          d="M2 4C7 4 10 7 10 12"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          fill="none"
+          strokeLinecap="round"
+        />
       </svg>
     ),
   },
   scrap: {
-    label: 'Web Scraping',
-    color: 'var(--green)',
-    dimColor: 'var(--green-dim)',
+    label: "Web Scraping",
+    color: "var(--green)",
+    dimColor: "var(--green-dim)",
     icon: (
       <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-        <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-        <ellipse cx="7" cy="7" rx="2" ry="5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-        <line x1="2" y1="7" x2="12" y2="7" stroke="currentColor" strokeWidth="1.2"/>
+        <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.2" fill="none" />
+        <ellipse cx="7" cy="7" rx="2" ry="5" stroke="currentColor" strokeWidth="1.2" fill="none" />
+        <line x1="2" y1="7" x2="12" y2="7" stroke="currentColor" strokeWidth="1.2" />
       </svg>
     ),
   },
@@ -121,7 +126,7 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
   return (
     <aside
       className="w-[220px] shrink-0 overflow-y-auto"
-      style={{ borderRight: '1px solid hsl(var(--border))' }}
+      style={{ borderRight: "1px solid hsl(var(--border))" }}
     >
       <div className="px-3 pt-2">
         {/* All feed */}
@@ -133,7 +138,7 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
               ? "text-foreground font-medium"
               : "text-muted-foreground hover:text-foreground",
           )}
-          style={selection.type === "all" ? { background: 'var(--surface-3)' } : undefined}
+          style={selection.type === "all" ? { background: "var(--surface-3)" } : undefined}
         >
           <LayoutList className="h-3.5 w-3.5 shrink-0" />
           <span>{t.feed.allFeeds}</span>
@@ -148,7 +153,7 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
               ? "text-foreground font-medium"
               : "text-muted-foreground hover:text-foreground",
           )}
-          style={isDocActive ? { background: 'var(--surface-3)' } : undefined}
+          style={isDocActive ? { background: "var(--surface-3)" } : undefined}
         >
           <BookOpen className="h-3.5 w-3.5 shrink-0" />
           <span>{t.documentation.myDocs}</span>
@@ -158,14 +163,14 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
         <div className="flex items-center justify-between mb-2 px-2">
           <span
             className="text-[10px] font-mono font-semibold uppercase tracking-widest"
-            style={{ color: 'var(--dim)' }}
+            style={{ color: "var(--dim)" }}
           >
             {t.feed.myFeeds}
           </span>
           <button
             onClick={() => setAddOpen(true)}
             className="w-5 h-5 flex items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors"
-            style={{ border: '1px solid hsl(var(--border))' }}
+            style={{ border: "1px solid hsl(var(--border))" }}
             aria-label={t.addFlux.title}
           >
             <Plus className="h-3 w-3" />
@@ -176,7 +181,8 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
         <nav className="space-y-0.5">
           {providers.map((provider) => {
             const meta = PROVIDER_META[provider]
-            const isCategoryActive = selection.type === "category" && selection.provider === provider
+            const isCategoryActive =
+              selection.type === "category" && selection.provider === provider
             const open = isExpanded(provider)
             const count = byProvider[provider]?.length ?? 0
 
@@ -201,7 +207,7 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
                         ? "text-foreground font-medium"
                         : "text-muted-foreground hover:text-foreground",
                     )}
-                    style={isCategoryActive ? { background: 'var(--surface-3)' } : undefined}
+                    style={isCategoryActive ? { background: "var(--surface-3)" } : undefined}
                   >
                     <span style={{ color: meta.color }}>{meta.icon}</span>
                     <span className="truncate flex-1">{meta.label}</span>
@@ -225,7 +231,7 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
                             "group flex items-center rounded-md transition-colors",
                             isActive ? "" : "hover:bg-accent",
                           )}
-                          style={isActive ? { background: 'var(--surface-3)' } : undefined}
+                          style={isActive ? { background: "var(--surface-3)" } : undefined}
                         >
                           {isActive && (
                             <div
@@ -235,7 +241,11 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
                           )}
                           <button
                             onClick={() =>
-                              setSelection({ type: "flux", fluxId: flux.id, provider: flux.provider })
+                              setSelection({
+                                type: "flux",
+                                fluxId: flux.id,
+                                provider: flux.provider,
+                              })
                             }
                             className={cn(
                               "flex-1 truncate px-2 py-1 text-[12px] font-mono text-left",
