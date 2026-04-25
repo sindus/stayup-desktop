@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "StayUp",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "identifier": "dev.r-sik.stayup-desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -25,7 +25,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDcxNEI5OEJCQUUwQkUyOEIKUldTTDRndXV1NWhMY1ladGhUck5CTFg2T0R4QnlDTzZleGZlWkhPYk83ekVFM3dxR0NjZDM1TXcK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEYwQzEzQkNFQzMwRUFDREUKUldUZXJBN0R6anZCOEF1LzZUWjZ0YVdXclF3bkRKZ3haVXpmSGVlSzdpWHBIc3lzQi9hWnZRM2oK",
       "endpoints": [
         "https://github.com/sindus/stayup-desktop/releases/latest/download/latest.json"
       ]
