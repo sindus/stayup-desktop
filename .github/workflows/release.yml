@@ -93,17 +93,18 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Write signing key to file
+      - name: Set signing key
         shell: bash
         env:
           KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        run: printf '%s' "$KEY" > /tmp/signing.key
+        run: |
+          printf '%s' "$KEY" > /tmp/signing.key
+          echo "TAURI_SIGNING_PRIVATE_KEY=$(cat /tmp/signing.key)" >> $GITHUB_ENV
 
       - name: Build & upload
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY_PATH: /tmp/signing.key
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
