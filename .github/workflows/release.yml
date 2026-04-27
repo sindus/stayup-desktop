@@ -111,11 +111,34 @@ jobs:
           tagName: ${{ github.ref_name }}
           args: ${{ matrix.args }}
 
+  snap:
+    needs: create-release
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build snap
+        uses: snapcore/action-build@v1
+        id: build
+        with:
+          snapcraft-channel: stable
+
+      - name: Publish snap
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: stable
+
   publish-release:
     needs: [create-release, build]
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Publish release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -123,3 +146,39 @@ jobs:
           gh api repos/${{ github.repository }}/releases/${{ needs.create-release.outputs.release_id }} \
             --method PATCH \
             --field draft=false
+
+      - name: Update Homebrew cask
+        env:
+          TAP_DEPLOY_KEY: ${{ secrets.TAP_DEPLOY_KEY }}
+        run: |
+          VERSION="${{ github.ref_name }}"
+          VERSION="${VERSION#v}"
+
+          ARM_SHA=$(gh release download "${{ github.ref_name }}" \
+            --repo sindus/stayup-desktop \
+            --pattern "StayUp_${VERSION}_aarch64.dmg" \
+            --output - | sha256sum | awk '{print $1}')
+          X64_SHA=$(gh release download "${{ github.ref_name }}" \
+            --repo sindus/stayup-desktop \
+            --pattern "StayUp_${VERSION}_x64.dmg" \
+            --output - | sha256sum | awk '{print $1}')
+
+          mkdir -p ~/.ssh
+          echo "$TAP_DEPLOY_KEY" > ~/.ssh/tap_key
+          chmod 600 ~/.ssh/tap_key
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/tap_key -o StrictHostKeyChecking=no" \
+            git clone git@github.com:sindus/homebrew-tap.git /tmp/homebrew-tap
+
+          cd /tmp/homebrew-tap
+          sed -i "s/version \".*\"/version \"${VERSION}\"/" Casks/stayup.rb
+          sed -i "/on_arm/,/end/{s/sha256 \".*\"/sha256 \"${ARM_SHA}\"/}" Casks/stayup.rb
+          sed -i "/on_intel/,/end/{s/sha256 \".*\"/sha256 \"${X64_SHA}\"/}" Casks/stayup.rb
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/stayup.rb
+          git diff --staged --quiet || \
+            GIT_SSH_COMMAND="ssh -i ~/.ssh/tap_key -o StrictHostKeyChecking=no" \
+            git commit -m "chore: update StayUp to ${VERSION}" && \
+            GIT_SSH_COMMAND="ssh -i ~/.ssh/tap_key -o StrictHostKeyChecking=no" \
+            git push

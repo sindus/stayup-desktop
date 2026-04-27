@@ -1,0 +1,71 @@
+name: stayup
+base: core22
+version: "0.3.8"
+summary: Stay up to date with everything
+description: |
+  StayUp aggregates GitHub changelogs, YouTube videos, RSS feeds and web pages
+  into a single personalized feed. Never miss a release or update again.
+grade: stable
+confinement: strict
+
+architectures:
+  - build-on: amd64
+
+parts:
+  stayup:
+    plugin: nil
+    build-packages:
+      - curl
+      - file
+      - libwebkit2gtk-4.1-dev
+      - libappindicator3-dev
+      - librsvg2-dev
+      - patchelf
+    build-snaps:
+      - node/20/stable
+      - rustup/latest/stable
+    override-build: |
+      rustup default stable
+      export HOME=/root
+      npm ci
+      npm run tauri build -- --bundles appimage
+      install -Dm755 \
+        src-tauri/target/release/stayup-desktop \
+        "$SNAPCRAFT_PART_INSTALL/usr/bin/stayup"
+      install -Dm644 \
+        src-tauri/icons/128x128.png \
+        "$SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/128x128/apps/stayup.png"
+      install -Dm644 \
+        src-tauri/icons/32x32.png \
+        "$SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/32x32/apps/stayup.png"
+    stage-packages:
+      - libwebkit2gtk-4.1-0
+      - libappindicator3-1
+      - libgtk-3-0
+      - libglib2.0-0
+      - libgdk-pixbuf-2.0-0
+      - librsvg2-2
+      - libpango-1.0-0
+      - libcairo2
+
+layout:
+  /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1:
+    bind: $SNAP/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
+
+apps:
+  stayup:
+    command: usr/bin/stayup
+    desktop: usr/share/applications/stayup.desktop
+    extensions: [gnome]
+    plugs:
+      - network
+      - network-bind
+      - home
+      - desktop
+      - desktop-legacy
+      - x11
+      - wayland
+      - opengl
+      - audio-playback
+      - browser-support
+      - gsettings
