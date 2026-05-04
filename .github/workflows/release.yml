@@ -159,6 +159,7 @@ jobs:
 
       - name: Update Homebrew cask
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAP_DEPLOY_KEY: ${{ secrets.TAP_DEPLOY_KEY }}
         run: |
           VERSION="${{ github.ref_name }}"
