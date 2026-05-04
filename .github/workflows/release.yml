@@ -135,11 +135,19 @@ jobs:
           release: stable
 
   publish-release:
-    needs: [create-release, build]
+    needs: [create-release, build, snap]
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Snap build status
+        run: |
+          if [ "${{ needs.snap.result }}" = "success" ]; then
+            echo "::notice::Snap build succeeded — Snap Store is up to date."
+          else
+            echo "::warning::Snap build ${{ needs.snap.result }} — Snap Store was NOT updated. Re-run the snap job manually to publish."
+          fi
 
       - name: Publish release
         env:
