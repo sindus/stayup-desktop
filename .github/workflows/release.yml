@@ -133,7 +133,7 @@ jobs:
           release: stable
 
   publish-release:
-    needs: [create-release, build]
+    needs: [create-release, build, snap]
     runs-on: ubuntu-latest
 
     steps:

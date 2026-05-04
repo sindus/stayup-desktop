@@ -22,13 +22,14 @@ parts:
       - libappindicator3-dev
       - librsvg2-dev
       - patchelf
+      - build-essential
     build-snaps:
       - node/20/stable
-      - rustup/latest/stable
     override-build: |
       cd $SNAPCRAFT_PART_SRC
-      rustup default stable
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       export HOME=/root
+      export PATH=$HOME/.cargo/bin:$PATH
       npm ci
       npm run tauri build -- --bundles appimage
       install -Dm755 \
