@@ -1,6 +1,6 @@
 name: stayup
 base: core22
-version: "0.4.0"
+version: "0.4.1"
 summary: Stay up to date with everything
 description: |
   StayUp aggregates GitHub changelogs, YouTube videos, RSS feeds and web pages
@@ -23,6 +23,7 @@ parts:
       - librsvg2-dev
       - patchelf
       - build-essential
+      - xdg-utils
     build-snaps:
       - node/20/stable
     override-build: |
