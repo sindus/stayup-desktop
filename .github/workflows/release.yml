@@ -114,6 +114,8 @@ jobs:
   snap:
     needs: create-release
     runs-on: ubuntu-22.04
+    # Snap Store publishing is independent — failures do not block the GitHub release
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
@@ -133,7 +135,7 @@ jobs:
           release: stable
 
   publish-release:
-    needs: [create-release, build, snap]
+    needs: [create-release, build]
     runs-on: ubuntu-latest
 
     steps:
