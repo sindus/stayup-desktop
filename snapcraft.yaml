@@ -32,7 +32,8 @@ parts:
       export HOME=/root
       export PATH=$HOME/.cargo/bin:$PATH
       npm ci
-      npm run tauri build -- --bundles none
+      npm run build
+      cd src-tauri && cargo build --release && cd $SNAPCRAFT_PART_SRC
       install -Dm755 \
         src-tauri/target/release/stayup-desktop \
         "$SNAPCRAFT_PART_INSTALL/usr/bin/stayup"
