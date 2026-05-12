@@ -119,7 +119,7 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
                 setScrapRepos(null)
                 setError(null)
               }}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              className="w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
             >
               <option value="changelog">GitHub Changelog</option>
               <option value="youtube">YouTube</option>
@@ -137,7 +137,7 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
                 <select
                   value={scrapRepoId}
                   onChange={(e) => setScrapRepoId(e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 >
                   <option value="">{t.addFlux.selectScrapRepo}</option>
                   {availableScrapRepos.length === 0 ? (
@@ -164,7 +164,7 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder={t.addFlux.placeholders[provider as FeedProvider]}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                className="w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
           )}

@@ -67,6 +67,14 @@ export const en: Translations = {
     current: "Current",
     notScrappedYet: "Not scraped yet",
   },
+  viewer: {
+    selectItem: "Select an item.",
+    noTitle: "Untitled",
+    openOnGithub: "View release on GitHub",
+    watchOnYoutube: "Watch on YouTube",
+    readArticle: "Read article",
+    visitWebsite: "Visit website",
+  },
   userMenu: {
     signOut: "Sign out",
   },

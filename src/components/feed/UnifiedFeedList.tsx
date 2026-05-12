@@ -1,14 +1,11 @@
 import type {
-  ChangelogItem,
-  YoutubeItem,
+  TaggedItem,
   YoutubeItemContent,
-  RssItem,
   RssItemContent,
-  ScrapItem,
   ScrapItemParams,
   Provider,
 } from "@/types"
-import { formatDate, openUrl } from "@/lib/utils"
+import { formatDate } from "@/lib/utils"
 
 function extractHostname(url: string): string {
   try {
@@ -28,18 +25,6 @@ function extractChannelName(url: string): string {
   } catch {
     return url
   }
-}
-
-type TaggedItem =
-  | { provider: "changelog"; item: ChangelogItem }
-  | { provider: "youtube"; item: YoutubeItem }
-  | { provider: "rss"; item: RssItem }
-  | { provider: "scrap"; item: ScrapItem }
-
-function getItemDate(tagged: TaggedItem): string {
-  const item = tagged.item
-  if ("datetime" in item && item.datetime) return item.datetime
-  return item.executed_at
 }
 
 const PROVIDER_COLORS: Record<Provider, string> = {
@@ -100,28 +85,19 @@ const PROVIDER_ICONS: Record<Provider, React.ReactNode> = {
 }
 
 interface UnifiedFeedListProps {
-  changelog: ChangelogItem[]
-  youtube: YoutubeItem[]
-  rss: RssItem[]
-  scrap: ScrapItem[]
-  repositories?: { repository_id: number; url: string }[]
+  items: TaggedItem[]
+  selectedIndex: number | null
+  onSelect: (index: number) => void
+  repositories: { repository_id: number; url: string }[]
 }
 
 export function UnifiedFeedList({
-  changelog,
-  youtube,
-  rss,
-  scrap,
-  repositories = [],
+  items,
+  selectedIndex,
+  onSelect,
+  repositories,
 }: UnifiedFeedListProps) {
-  const all: TaggedItem[] = [
-    ...changelog.map((item) => ({ provider: "changelog" as const, item })),
-    ...youtube.map((item) => ({ provider: "youtube" as const, item })),
-    ...rss.map((item) => ({ provider: "rss" as const, item })),
-    ...scrap.map((item) => ({ provider: "scrap" as const, item })),
-  ]
-
-  if (all.length === 0) {
+  if (items.length === 0) {
     return (
       <p className="text-[13px] text-muted-foreground italic py-12 text-center">
         Aucun contenu disponible.
@@ -131,27 +107,26 @@ export function UnifiedFeedList({
 
   const repoUrlMap = Object.fromEntries(repositories.map((r) => [r.repository_id, r.url]))
 
-  const sorted = all.sort(
-    (a, b) => new Date(getItemDate(b)).getTime() - new Date(getItemDate(a)).getTime(),
-  )
-
   return (
-    <div className="divide-y" style={{ borderColor: "var(--border-subtle)" }}>
-      {sorted.map((tagged, i) => {
+    <div>
+      {items.map((tagged, i) => {
         const color = PROVIDER_COLORS[tagged.provider]
         const icon = PROVIDER_ICONS[tagged.provider]
+        const isSelected = selectedIndex === i
+
         return (
           <div
             key={i}
-            className="flex gap-3 px-1 py-3 transition-colors rounded"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--surface-2)"
+            data-index={i}
+            className="flex gap-3 px-3 py-2.5 cursor-pointer transition-colors"
+            style={{
+              background: isSelected ? "var(--surface-2)" : undefined,
+              borderLeft: isSelected ? `2px solid ${color}` : "2px solid transparent",
+              borderBottom: "1px solid var(--border-subtle)",
             }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = ""
-            }}
+            onClick={() => onSelect(i)}
           >
-            <div className="mt-1 shrink-0" style={{ color }}>
+            <div className="mt-0.5 shrink-0" style={{ color }}>
               {icon}
             </div>
             <div className="flex-1 min-w-0">
@@ -180,22 +155,20 @@ function ChangelogEntry({
   color,
   dimColor,
 }: {
-  item: ChangelogItem
+  item: import("@/types").ChangelogItem
   repoUrl: string
   color: string
   dimColor: string
 }) {
-  const href = repoUrl ? `${repoUrl}/releases/tag/${item.version}` : undefined
-
-  const content = (
-    <div className="pl-3 py-1" style={{ borderLeft: "2px solid hsl(var(--border))" }}>
-      <div className="flex items-center justify-between gap-2 mb-1">
-        <div className="flex items-center gap-2">
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-2 mb-0.5">
+        <div className="flex items-center gap-2 min-w-0">
           <span className="text-[12px] font-mono text-muted-foreground truncate">
             {repoUrl?.replace("https://github.com/", "") ?? "repository"}
           </span>
           <span
-            className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded"
+            className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded shrink-0"
             style={{ background: dimColor, color }}
           >
             {item.version}
@@ -206,33 +179,18 @@ function ChangelogEntry({
         </span>
       </div>
       {item.content && (
-        <p className="text-[13px] text-gray-400 line-clamp-2 leading-relaxed">
+        <p className="text-[12px] text-muted-foreground line-clamp-1 leading-relaxed">
           {item.content
             .replace(/#{1,6}\s/g, "")
             .replace(/\r\n/g, " ")
-            .slice(0, 200)}
+            .slice(0, 120)}
         </p>
       )}
     </div>
   )
-
-  if (!href) return content
-
-  return (
-    <a
-      href={href}
-      onClick={(e) => {
-        e.preventDefault()
-        void openUrl(href)
-      }}
-      className="block cursor-pointer"
-    >
-      {content}
-    </a>
-  )
 }
 
-function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
+function YoutubeEntry({ item, color }: { item: import("@/types").YoutubeItem; color: string }) {
   let parsed: YoutubeItemContent | null = null
   try {
     parsed = JSON.parse(item.content) as YoutubeItemContent
@@ -240,23 +198,23 @@ function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
     /* ignore */
   }
 
-  const inner = (
+  return (
     <div className="flex gap-3">
       <div
-        className="w-24 h-[54px] rounded shrink-0 flex items-center justify-center overflow-hidden"
+        className="w-20 h-[45px] rounded shrink-0 flex items-center justify-center overflow-hidden"
         style={{ background: "var(--surface-2)" }}
       >
         {parsed?.thumbnail ? (
           <img
             src={parsed.thumbnail}
             alt={parsed?.title ?? ""}
-            width={96}
-            height={54}
+            width={80}
+            height={45}
             loading="lazy"
             className="object-cover w-full h-full"
           />
         ) : (
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ color }}>
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ color }}>
             <circle
               cx="10"
               cy="10"
@@ -270,42 +228,26 @@ function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
           </svg>
         )}
       </div>
-      <div className="space-y-1 min-w-0">
-        <p className="text-[13.5px] font-medium line-clamp-2 leading-snug text-gray-100">
+      <div className="flex-1 min-w-0">
+        <p className="text-[13px] font-medium line-clamp-2 leading-snug text-gray-900 dark:text-gray-100 mb-0.5">
           {parsed?.title ?? "Sans titre"}
         </p>
         <div className="flex items-center gap-2">
           {parsed?.url && (
-            <span className="text-[11px] font-mono" style={{ color }}>
+            <span className="text-[11px] font-mono truncate" style={{ color }}>
               {extractChannelName(parsed.url)}
             </span>
           )}
-          <span className="text-[11px] font-mono text-gray-500">
+          <span className="text-[11px] font-mono shrink-0 text-gray-500">
             {formatDate(item.datetime ?? item.executed_at)}
           </span>
         </div>
       </div>
     </div>
   )
-
-  const videoUrl = parsed?.link ?? parsed?.url
-  if (!videoUrl) return inner
-
-  return (
-    <a
-      href={videoUrl}
-      onClick={(e) => {
-        e.preventDefault()
-        void openUrl(videoUrl)
-      }}
-      className="block cursor-pointer"
-    >
-      {inner}
-    </a>
-  )
 }
 
-function RssEntry({ item, color }: { item: RssItem; color: string }) {
+function RssEntry({ item, color }: { item: import("@/types").RssItem; color: string }) {
   let parsed: RssItemContent | null = null
   try {
     parsed = JSON.parse(item.content) as RssItemContent
@@ -315,10 +257,10 @@ function RssEntry({ item, color }: { item: RssItem; color: string }) {
 
   const source = parsed?.link ? extractHostname(parsed.link) : null
 
-  const inner = (
-    <div className="pl-3 py-1" style={{ borderLeft: "2px solid hsl(var(--border))" }}>
-      <div className="flex items-center justify-between gap-2 mb-1">
-        <span className="text-[13.5px] font-medium line-clamp-1 text-gray-100">
+  return (
+    <div>
+      <div className="flex items-start justify-between gap-2 mb-0.5">
+        <span className="text-[13px] font-medium line-clamp-1 text-gray-900 dark:text-gray-100">
           {parsed?.title ?? "Sans titre"}
         </span>
         <span className="text-[11px] font-mono shrink-0 text-gray-500">
@@ -326,34 +268,15 @@ function RssEntry({ item, color }: { item: RssItem; color: string }) {
         </span>
       </div>
       {source && (
-        <p className="text-[11px] font-mono mb-1" style={{ color }}>
+        <p className="text-[11px] font-mono" style={{ color }}>
           {source}
         </p>
       )}
-      {parsed?.summary && (
-        <p className="text-[13px] text-gray-400 line-clamp-2 leading-relaxed">{parsed.summary}</p>
-      )}
     </div>
-  )
-
-  if (!parsed?.link) return inner
-
-  const link = parsed.link
-  return (
-    <a
-      href={link}
-      onClick={(e) => {
-        e.preventDefault()
-        void openUrl(link)
-      }}
-      className="block cursor-pointer"
-    >
-      {inner}
-    </a>
   )
 }
 
-function ScrapEntry({ item, color }: { item: ScrapItem; color: string }) {
+function ScrapEntry({ item, color }: { item: import("@/types").ScrapItem; color: string }) {
   const params: ScrapItemParams | null =
     typeof item.params === "string"
       ? (() => {
@@ -365,39 +288,23 @@ function ScrapEntry({ item, color }: { item: ScrapItem; color: string }) {
         })()
       : (item.params as ScrapItemParams | null)
 
-  const inner = (
-    <div className="pl-3 py-1" style={{ borderLeft: "2px solid hsl(var(--border))" }}>
-      <div className="flex items-center justify-between gap-2 mb-1">
-        {params?.url && (
-          <span className="text-[12px] font-mono line-clamp-1 truncate" style={{ color }}>
-            {params.url}
-          </span>
-        )}
+  const source = params?.url ? extractHostname(params.url) : null
+
+  return (
+    <div>
+      <div className="flex items-start justify-between gap-2 mb-0.5">
+        <span className="text-[13px] font-medium line-clamp-1 text-gray-900 dark:text-gray-100">
+          {item.content?.slice(0, 80) ?? params?.url ?? "Scrap"}
+        </span>
         <span className="text-[11px] font-mono shrink-0 text-gray-500">
           {formatDate(item.executed_at)}
         </span>
       </div>
-      {item.content && (
-        <p className="text-[13px] text-gray-400 line-clamp-2 leading-relaxed">
-          {item.content.slice(0, 200)}
+      {source && (
+        <p className="text-[11px] font-mono" style={{ color }}>
+          {source}
         </p>
       )}
     </div>
-  )
-
-  if (!params?.url) return inner
-
-  const url = params.url
-  return (
-    <a
-      href={url}
-      onClick={(e) => {
-        e.preventDefault()
-        void openUrl(url)
-      }}
-      className="block cursor-pointer"
-    >
-      {inner}
-    </a>
   )
 }

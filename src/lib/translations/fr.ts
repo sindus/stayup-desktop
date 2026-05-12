@@ -65,6 +65,14 @@ export const fr = {
     current: "Actuel",
     notScrappedYet: "Pas encore scrappé",
   },
+  viewer: {
+    selectItem: "Sélectionnez un élément.",
+    noTitle: "Sans titre",
+    openOnGithub: "Voir sur GitHub",
+    watchOnYoutube: "Voir sur YouTube",
+    readArticle: "Lire l'article",
+    visitWebsite: "Visiter le site",
+  },
   userMenu: {
     signOut: "Déconnexion",
   },

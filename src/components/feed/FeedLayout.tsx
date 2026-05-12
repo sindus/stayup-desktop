@@ -1,18 +1,20 @@
-import { useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo, useRef } from "react"
 import { useNavigationStore } from "@/store/navigation"
 import { useFeed } from "@/hooks/useFeed"
 import { useMenu } from "@/hooks/useMenu"
 import { useLanguage } from "@/context/LanguageContext"
 import { useTheme } from "@/context/ThemeContext"
 import { FeedSidebar } from "./FeedSidebar"
-import { FeedItemList } from "./FeedItemList"
 import { UnifiedFeedList } from "./UnifiedFeedList"
+import { FeedContentViewer } from "./FeedContentViewer"
 import { DocList } from "@/components/documentation/DocList"
 import { DocViewer } from "@/components/documentation/DocViewer"
 import { HistoryList } from "@/components/documentation/HistoryList"
 import { DiffViewer } from "@/components/documentation/DiffViewer"
 import { UserMenu } from "@/components/layout/UserMenu"
+import { openUrl } from "@/lib/utils"
 import type { AppSession } from "@/lib/session"
+import type { TaggedItem, Provider } from "@/types"
 
 interface FeedLayoutProps {
   session: AppSession
@@ -20,11 +22,56 @@ interface FeedLayoutProps {
   onCheckUpdates: () => void
 }
 
+function getItemDate(tagged: TaggedItem): string {
+  const item = tagged.item
+  if ("datetime" in item && item.datetime) return item.datetime
+  return item.executed_at
+}
+
+function getItemExternalUrl(tagged: TaggedItem, repoUrlMap: Record<number, string>): string | null {
+  if (tagged.provider === "changelog") {
+    const repoUrl = repoUrlMap[tagged.item.repository_id]
+    return repoUrl ? `${repoUrl}/releases/tag/${tagged.item.version}` : null
+  }
+  if (tagged.provider === "youtube") {
+    try {
+      const p = JSON.parse(tagged.item.content) as { link?: string; url?: string }
+      return p.link ?? p.url ?? null
+    } catch {
+      return null
+    }
+  }
+  if (tagged.provider === "rss") {
+    try {
+      const p = JSON.parse(tagged.item.content) as { link?: string }
+      return p.link ?? null
+    } catch {
+      return null
+    }
+  }
+  if (tagged.provider === "scrap") {
+    const raw = tagged.item.params
+    const params =
+      typeof raw === "string"
+        ? (() => {
+            try {
+              return JSON.parse(raw)
+            } catch {
+              return null
+            }
+          })()
+        : raw
+    return (params as { url?: string } | null)?.url ?? null
+  }
+  return null
+}
+
 export function FeedLayout({ session, onLogout, onCheckUpdates }: FeedLayoutProps) {
   const { selection } = useNavigationStore()
   const { fluxes, connectors, loading, error, refresh } = useFeed(session.userId)
   const { lang, t, setLang } = useLanguage()
   const { theme, setTheme } = useTheme()
+  const listContainerRef = useRef<HTMLDivElement>(null)
 
   const stableRefresh = useCallback(() => refresh(), [refresh])
 
@@ -38,84 +85,124 @@ export function FeedLayout({ session, onLogout, onCheckUpdates }: FeedLayoutProp
     onRefresh: stableRefresh,
   })
 
-  const repositories = fluxes.map((f) => ({
-    repository_id: f.repository_id,
-    url: f.url,
-  }))
+  const repositories = useMemo(
+    () => fluxes.map((f) => ({ repository_id: f.repository_id, url: f.url })),
+    [fluxes],
+  )
 
-  function renderContent() {
-    if (selection.type === "documentation") return <DocList />
-    if (selection.type === "doc") return <DocViewer docId={selection.docId} />
-    if (selection.type === "doc-history") return <HistoryList docId={selection.docId} />
-    if (selection.type === "doc-diff")
-      return <DiffViewer docId={selection.docId} versionId={selection.versionId} />
+  const repoUrlMap = useMemo(
+    () => Object.fromEntries(fluxes.map((f) => [f.repository_id, f.url])),
+    [fluxes],
+  )
 
-    if (loading) {
-      return (
-        <p className="text-[13px] text-muted-foreground italic py-12 text-center">
-          {t.feed.loading}
-        </p>
-      )
-    }
-    if (error) {
-      return (
-        <div className="py-12 text-center space-y-2">
-          <p className="text-[13px] text-destructive">{error}</p>
-          <button onClick={refresh} className="text-xs text-muted-foreground underline">
-            {t.feed.retry}
-          </button>
-        </div>
-      )
-    }
-    if (!connectors) return null
+  const isFeedView =
+    selection.type === "all" || selection.type === "category" || selection.type === "flux"
+
+  // Stable key for the current feed view — resets selected index when it changes
+  const selectionId = useMemo(() => {
+    if (selection.type === "category") return `category:${selection.provider}`
+    if (selection.type === "flux") return `flux:${selection.fluxId}`
+    return selection.type
+  }, [selection])
+
+  // Store selectionId alongside the index so stale indexes are ignored without a reset effect
+  const [selectedState, setSelectedState] = useState<{ id: string; index: number | null }>({
+    id: "",
+    index: null,
+  })
+  const selectedIndex = selectedState.id === selectionId ? selectedState.index : null
+
+  const handleSelect = useCallback(
+    (index: number) => setSelectedState({ id: selectionId, index }),
+    [selectionId],
+  )
+
+  const sortedItems = useMemo((): TaggedItem[] => {
+    if (!connectors || !isFeedView) return []
+
+    let raw: TaggedItem[] = []
 
     if (selection.type === "all") {
-      return (
-        <UnifiedFeedList
-          changelog={connectors.changelog}
-          youtube={connectors.youtube}
-          rss={connectors.rss}
-          scrap={connectors.scrap}
-          repositories={repositories}
-        />
-      )
-    }
-
-    if (selection.type === "category") {
+      raw = [
+        ...(connectors.changelog ?? []).map((item) => ({ provider: "changelog" as const, item })),
+        ...(connectors.youtube ?? []).map((item) => ({ provider: "youtube" as const, item })),
+        ...(connectors.rss ?? []).map((item) => ({ provider: "rss" as const, item })),
+        ...(connectors.scrap ?? []).map((item) => ({ provider: "scrap" as const, item })),
+      ]
+    } else if (selection.type === "category") {
       const { provider } = selection
       const items =
         provider === "changelog"
-          ? connectors.changelog
+          ? (connectors.changelog ?? [])
           : provider === "youtube"
-            ? connectors.youtube
+            ? (connectors.youtube ?? [])
             : provider === "rss"
-              ? connectors.rss
-              : connectors.scrap
-
-      return <FeedItemList items={items} provider={provider} repositories={repositories} />
-    }
-
-    if (selection.type === "flux") {
+              ? (connectors.rss ?? [])
+              : (connectors.scrap ?? [])
+      raw = items.map((item) => ({ provider: provider as Provider, item }) as TaggedItem)
+    } else if (selection.type === "flux") {
       const { fluxId, provider } = selection
       const flux = fluxes.find((f) => f.id === fluxId)
       const repoId = flux?.repository_id
-
       const allItems =
         provider === "changelog"
-          ? connectors.changelog
+          ? (connectors.changelog ?? [])
           : provider === "youtube"
-            ? connectors.youtube
+            ? (connectors.youtube ?? [])
             : provider === "rss"
-              ? connectors.rss
-              : connectors.scrap
-
-      const filtered = repoId ? allItems.filter((item) => item.repository_id === repoId) : allItems
-
-      return <FeedItemList items={filtered} provider={provider} repositories={repositories} />
+              ? (connectors.rss ?? [])
+              : (connectors.scrap ?? [])
+      const filtered = repoId ? allItems.filter((i) => i.repository_id === repoId) : allItems
+      raw = filtered.map((item) => ({ provider: provider as Provider, item }) as TaggedItem)
     }
 
-    return null
-  }
+    return raw.sort(
+      (a, b) => new Date(getItemDate(b)).getTime() - new Date(getItemDate(a)).getTime(),
+    )
+  }, [connectors, selection, fluxes, isFeedView])
+
+  // Scroll selected item into view
+  useEffect(() => {
+    if (selectedIndex === null) return
+    const el = listContainerRef.current?.querySelector(`[data-index="${selectedIndex}"]`)
+    el?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+  }, [selectedIndex])
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!isFeedView) return
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (!sortedItems.length) return
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault()
+        setSelectedState((prev) => {
+          const idx = prev.id === selectionId ? prev.index : null
+          return {
+            id: selectionId,
+            index: idx === null ? 0 : Math.min(idx + 1, sortedItems.length - 1),
+          }
+        })
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault()
+        setSelectedState((prev) => {
+          const idx = prev.id === selectionId ? prev.index : null
+          return {
+            id: selectionId,
+            index: idx === null ? 0 : Math.max(idx - 1, 0),
+          }
+        })
+      } else if (e.key === "Enter" && selectedIndex !== null) {
+        const url = getItemExternalUrl(sortedItems[selectedIndex], repoUrlMap)
+        if (url) void openUrl(url)
+      }
+    }
+
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [isFeedView, sortedItems, selectionId, repoUrlMap, selectedIndex])
 
   const initial = session.userId?.charAt(0)?.toUpperCase() ?? "?"
 
@@ -156,7 +243,54 @@ export function FeedLayout({ session, onLogout, onCheckUpdates }: FeedLayoutProp
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
         <FeedSidebar fluxes={fluxes} userId={session.userId} onRefresh={stableRefresh} />
-        <main className="flex-1 overflow-y-auto px-5 py-4">{renderContent()}</main>
+
+        {isFeedView ? (
+          <>
+            {/* List panel */}
+            <div
+              ref={listContainerRef}
+              className="w-[380px] shrink-0 overflow-y-auto"
+              style={{ borderRight: "1px solid hsl(var(--border))" }}
+            >
+              {loading ? (
+                <p className="text-[13px] text-muted-foreground italic py-12 text-center">
+                  {t.feed.loading}
+                </p>
+              ) : error ? (
+                <div className="py-12 text-center space-y-2">
+                  <p className="text-[13px] text-destructive">{error}</p>
+                  <button onClick={refresh} className="text-xs text-muted-foreground underline">
+                    {t.feed.retry}
+                  </button>
+                </div>
+              ) : (
+                <UnifiedFeedList
+                  items={sortedItems}
+                  selectedIndex={selectedIndex}
+                  onSelect={handleSelect}
+                  repositories={repositories}
+                />
+              )}
+            </div>
+
+            {/* Content panel */}
+            <div className="flex-1 min-w-0 overflow-y-auto">
+              <FeedContentViewer
+                item={selectedIndex !== null ? sortedItems[selectedIndex] : null}
+                repositories={repositories}
+              />
+            </div>
+          </>
+        ) : (
+          <main className="flex-1 overflow-y-auto px-5 py-4">
+            {selection.type === "documentation" && <DocList />}
+            {selection.type === "doc" && <DocViewer docId={selection.docId} />}
+            {selection.type === "doc-history" && <HistoryList docId={selection.docId} />}
+            {selection.type === "doc-diff" && (
+              <DiffViewer docId={selection.docId} versionId={selection.versionId} />
+            )}
+          </main>
+        )}
       </div>
     </div>
   )

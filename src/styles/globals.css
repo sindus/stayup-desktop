@@ -5,7 +5,57 @@
 @tailwind utilities;
 
 @layer base {
+  /* Light mode (default) */
   :root {
+    --background: 0 0% 98%;
+    --foreground: 240 10% 6%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 6%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 6%;
+
+    --primary: 185 72% 38%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 5% 90%;
+    --secondary-foreground: 240 10% 6%;
+
+    --muted: 240 5% 90%;
+    --muted-foreground: 240 5% 40%;
+
+    --accent: 240 5% 90%;
+    --accent-foreground: 240 10% 6%;
+
+    --destructive: 14 80% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 84%;
+    --input: 240 5.9% 84%;
+    --ring: 185 72% 38%;
+
+    --radius: 0.375rem;
+
+    --surface: hsl(0 0% 98%);
+    --surface-2: hsl(240 5% 92%);
+    --surface-3: hsl(240 5% 87%);
+    --border-subtle: hsl(240 5% 88%);
+    --dim: hsl(240 5% 58%);
+
+    --teal: oklch(0.58 0.22 195);
+    --teal-dim: oklch(0.58 0.22 195 / 0.12);
+    --teal-mid: oklch(0.58 0.22 195 / 0.3);
+    --rose: oklch(0.52 0.22 15);
+    --rose-dim: oklch(0.52 0.22 15 / 0.12);
+    --amber: oklch(0.62 0.17 65);
+    --amber-dim: oklch(0.62 0.17 65 / 0.12);
+    --green: oklch(0.55 0.18 145);
+    --green-dim: oklch(0.55 0.18 145 / 0.12);
+  }
+
+  /* Dark mode */
+  .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
@@ -34,16 +84,12 @@
     --input: 240 4.4% 15.9%;
     --ring: 185 72% 50%;
 
-    --radius: 0.375rem;
-
-    /* Extended surface tokens */
     --surface: hsl(240 6% 7.1%);
     --surface-2: hsl(240 6% 10%);
     --surface-3: hsl(240 5.8% 11.6%);
     --border-subtle: hsl(240 5.3% 12.7%);
     --dim: hsl(240 7.1% 26.1%);
 
-    /* Provider colors */
     --teal: oklch(0.72 0.22 195);
     --teal-dim: oklch(0.72 0.22 195 / 0.12);
     --teal-mid: oklch(0.72 0.22 195 / 0.3);
