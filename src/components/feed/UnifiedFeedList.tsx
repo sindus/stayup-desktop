@@ -326,12 +326,12 @@ function RssEntry({ item, color }: { item: RssItem; color: string }) {
         </span>
       </div>
       {source && (
-        <p className="text-[11px] font-mono mb-1" style={{ color }}>{source}</p>
+        <p className="text-[11px] font-mono mb-1" style={{ color }}>
+          {source}
+        </p>
       )}
       {parsed?.summary && (
-        <p className="text-[13px] text-gray-400 line-clamp-2 leading-relaxed">
-          {parsed.summary}
-        </p>
+        <p className="text-[13px] text-gray-400 line-clamp-2 leading-relaxed">{parsed.summary}</p>
       )}
     </div>
   )
