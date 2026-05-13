@@ -78,9 +78,9 @@ apps:
     desktop: usr/share/applications/stayup.desktop
     extensions: [gnome]
     environment:
-      WEBKIT_DISABLE_COMPOSITING_MODE: "1"
       WEBKIT_DISABLE_DMABUF_RENDERER: "1"
       LIBGL_ALWAYS_SOFTWARE: "1"
+      GDK_BACKEND: "wayland"
       BAMF_DESKTOP_FILE_HINT: /var/lib/snapd/desktop/applications/stayup_stayup.desktop
     plugs:
       - network
