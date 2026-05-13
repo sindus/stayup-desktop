@@ -1,6 +1,6 @@
 name: stayup
 base: core22
-version: "0.5.2"
+version: "0.5.3"
 summary: Stay up to date with everything
 description: |
   StayUp aggregates GitHub changelogs, YouTube videos, RSS feeds and web pages
@@ -79,6 +79,7 @@ apps:
     extensions: [gnome]
     environment:
       WEBKIT_DISABLE_COMPOSITING_MODE: "1"
+      WEBKIT_DISABLE_DMABUF_RENDERER: "1"
       BAMF_DESKTOP_FILE_HINT: /var/lib/snapd/desktop/applications/stayup_stayup.desktop
     plugs:
       - network
