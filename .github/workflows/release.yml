@@ -114,8 +114,6 @@ jobs:
   snap:
     needs: create-release
     runs-on: ubuntu-22.04
-    # Snap Store publishing is independent — failures do not block the GitHub release
-    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
@@ -140,14 +138,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Snap build status
-        run: |
-          if [ "${{ needs.snap.result }}" = "success" ]; then
-            echo "::notice::Snap build succeeded — Snap Store is up to date."
-          else
-            echo "::warning::Snap build ${{ needs.snap.result }} — Snap Store was NOT updated. Re-run the snap job manually to publish."
-          fi
 
       - name: Publish release
         env:
