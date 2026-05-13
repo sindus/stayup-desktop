@@ -80,7 +80,6 @@ apps:
     environment:
       WEBKIT_DISABLE_DMABUF_RENDERER: "1"
       LIBGL_ALWAYS_SOFTWARE: "1"
-      GDK_BACKEND: "wayland"
       BAMF_DESKTOP_FILE_HINT: /var/lib/snapd/desktop/applications/stayup_stayup.desktop
     plugs:
       - network
