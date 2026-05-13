@@ -43,6 +43,9 @@ parts:
       install -Dm644 \
         src-tauri/icons/32x32.png \
         "$SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/32x32/apps/stayup.png"
+      install -Dm644 \
+        src-tauri/stayup.desktop \
+        "$SNAPCRAFT_PART_INSTALL/usr/share/applications/stayup.desktop"
     stage-packages:
       - libwebkit2gtk-4.1-0
       - libappindicator3-1

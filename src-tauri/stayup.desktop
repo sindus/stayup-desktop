@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=StayUp
+Comment=Stay up to date with everything
+Exec=stayup
+Icon=stayup
+Categories=Network;
+StartupNotify=true
