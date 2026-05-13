@@ -1,6 +1,6 @@
 name: stayup
-base: core22
-version: "0.5.4"
+base: core24
+version: "0.5.8"
 summary: Stay up to date with everything
 description: |
   StayUp aggregates GitHub changelogs, YouTube videos, RSS feeds and web pages
@@ -9,8 +9,8 @@ icon: src-tauri/icons/icon.png
 grade: stable
 confinement: strict
 
-architectures:
-  - build-on: amd64
+platforms:
+  amd64:
 
 parts:
   stayup:
@@ -79,7 +79,6 @@ apps:
     extensions: [gnome]
     environment:
       WEBKIT_DISABLE_DMABUF_RENDERER: "1"
-      LIBGL_ALWAYS_SOFTWARE: "1"
       BAMF_DESKTOP_FILE_HINT: /var/lib/snapd/desktop/applications/stayup_stayup.desktop
     plugs:
       - network
