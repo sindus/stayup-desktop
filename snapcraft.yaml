@@ -1,6 +1,6 @@
 name: stayup
 base: core22
-version: "0.5.0"
+version: "0.5.1"
 summary: Stay up to date with everything
 description: |
   StayUp aggregates GitHub changelogs, YouTube videos, RSS feeds and web pages
