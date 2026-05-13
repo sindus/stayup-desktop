@@ -56,9 +56,7 @@ export function FeedItemList({ items, provider, repositories = [] }: FeedItemLis
 
   if (items.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground italic py-12 text-center">
-        {t.feed.noContent}
-      </p>
+      <p className="text-sm text-muted-foreground italic py-12 text-center">{t.feed.noContent}</p>
     )
   }
 
@@ -80,11 +78,22 @@ export function FeedItemList({ items, provider, repositories = [] }: FeedItemLis
         ))}
       {provider === "youtube" &&
         (sorted as YoutubeItem[]).map((item) => (
-          <YoutubeEntry key={item.id} item={item} color={PROVIDER_COLORS[provider]} noTitle={t.viewer.noTitle} thumbnail={t.viewer.thumbnail} />
+          <YoutubeEntry
+            key={item.id}
+            item={item}
+            color={PROVIDER_COLORS[provider]}
+            noTitle={t.viewer.noTitle}
+            thumbnail={t.viewer.thumbnail}
+          />
         ))}
       {provider === "rss" &&
         (sorted as RssItem[]).map((item) => (
-          <RssEntry key={item.id} item={item} color={PROVIDER_COLORS[provider]} noTitle={t.viewer.noTitle} />
+          <RssEntry
+            key={item.id}
+            item={item}
+            color={PROVIDER_COLORS[provider]}
+            noTitle={t.viewer.noTitle}
+          />
         ))}
       {provider === "scrap" &&
         (sorted as ScrapItem[]).map((item) => (
@@ -132,7 +141,17 @@ function ChangelogEntry({ item, repoUrl }: { item: ChangelogItem; repoUrl: strin
   )
 }
 
-function YoutubeEntry({ item, color, noTitle, thumbnail }: { item: YoutubeItem; color: string; noTitle: string; thumbnail: string }) {
+function YoutubeEntry({
+  item,
+  color,
+  noTitle,
+  thumbnail,
+}: {
+  item: YoutubeItem
+  color: string
+  noTitle: string
+  thumbnail: string
+}) {
   let parsed: YoutubeItemContent | null = null
   try {
     parsed = JSON.parse(item.content) as YoutubeItemContent
@@ -153,9 +172,7 @@ function YoutubeEntry({ item, color, noTitle, thumbnail }: { item: YoutubeItem; 
         />
       )}
       <div className="space-y-1 min-w-0">
-        <p className="font-medium text-sm line-clamp-2 text-gray-100">
-          {parsed?.title ?? noTitle}
-        </p>
+        <p className="font-medium text-sm line-clamp-2 text-gray-100">{parsed?.title ?? noTitle}</p>
         <div className="flex items-center gap-2">
           {parsed?.url && (
             <span className="text-xs font-mono" style={{ color }}>

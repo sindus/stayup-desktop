@@ -105,7 +105,7 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
 
   async function handleDelete(flux: FeedFlux, e: React.MouseEvent) {
     e.stopPropagation()
-    if (!confirm(t.feed.confirmDelete.replace('{id}', flux.identifier))) return
+    if (!confirm(t.feed.confirmDelete.replace("{id}", flux.identifier))) return
     setDeleting(flux.id)
     try {
       const [token, apiUrl] = await Promise.all([readToken(), readApiUrl()])

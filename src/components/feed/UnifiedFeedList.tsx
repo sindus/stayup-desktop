@@ -142,9 +142,15 @@ export function UnifiedFeedList({
                   repositoryLabel={t.viewer.repository}
                 />
               )}
-              {tagged.provider === "youtube" && <YoutubeEntry item={tagged.item} color={color} noTitle={t.viewer.noTitle} />}
-              {tagged.provider === "rss" && <RssEntry item={tagged.item} color={color} noTitle={t.viewer.noTitle} />}
-              {tagged.provider === "scrap" && <ScrapEntry item={tagged.item} color={color} scrapLabel={t.feed.providers.scrap} />}
+              {tagged.provider === "youtube" && (
+                <YoutubeEntry item={tagged.item} color={color} noTitle={t.viewer.noTitle} />
+              )}
+              {tagged.provider === "rss" && (
+                <RssEntry item={tagged.item} color={color} noTitle={t.viewer.noTitle} />
+              )}
+              {tagged.provider === "scrap" && (
+                <ScrapEntry item={tagged.item} color={color} scrapLabel={t.feed.providers.scrap} />
+              )}
             </div>
           </div>
         )
@@ -196,7 +202,15 @@ function ChangelogEntry({
   )
 }
 
-function YoutubeEntry({ item, color, noTitle }: { item: import("@/types").YoutubeItem; color: string; noTitle: string }) {
+function YoutubeEntry({
+  item,
+  color,
+  noTitle,
+}: {
+  item: import("@/types").YoutubeItem
+  color: string
+  noTitle: string
+}) {
   let parsed: YoutubeItemContent | null = null
   try {
     parsed = JSON.parse(item.content) as YoutubeItemContent
@@ -253,7 +267,15 @@ function YoutubeEntry({ item, color, noTitle }: { item: import("@/types").Youtub
   )
 }
 
-function RssEntry({ item, color, noTitle }: { item: import("@/types").RssItem; color: string; noTitle: string }) {
+function RssEntry({
+  item,
+  color,
+  noTitle,
+}: {
+  item: import("@/types").RssItem
+  color: string
+  noTitle: string
+}) {
   let parsed: RssItemContent | null = null
   try {
     parsed = JSON.parse(item.content) as RssItemContent
@@ -282,7 +304,15 @@ function RssEntry({ item, color, noTitle }: { item: import("@/types").RssItem; c
   )
 }
 
-function ScrapEntry({ item, color, scrapLabel }: { item: import("@/types").ScrapItem; color: string; scrapLabel: string }) {
+function ScrapEntry({
+  item,
+  color,
+  scrapLabel,
+}: {
+  item: import("@/types").ScrapItem
+  color: string
+  scrapLabel: string
+}) {
   const params: ScrapItemParams | null =
     typeof item.params === "string"
       ? (() => {
