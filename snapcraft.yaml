@@ -1,6 +1,6 @@
 name: stayup
 base: core22
-version: "0.5.1"
+version: "0.5.2"
 summary: Stay up to date with everything
 description: |
   StayUp aggregates GitHub changelogs, YouTube videos, RSS feeds and web pages
@@ -29,9 +29,15 @@ parts:
       - node/20/stable
     override-build: |
       cd $SNAPCRAFT_PART_SRC
-      # Use the system user's rustup installation (works under sudo too)
-      export CARGO_HOME=/home/sikander/.cargo
-      export RUSTUP_HOME=/home/sikander/.rustup
+      # Local build (--destructive-mode): reuse user's rustup to avoid re-downloading
+      if [ -d "/home/sikander/.cargo" ]; then
+        export CARGO_HOME=/home/sikander/.cargo
+        export RUSTUP_HOME=/home/sikander/.rustup
+      else
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+        export CARGO_HOME="$HOME/.cargo"
+        export RUSTUP_HOME="$HOME/.rustup"
+      fi
       export PATH="$CARGO_HOME/bin:$PATH"
       npm ci
       npm run build
