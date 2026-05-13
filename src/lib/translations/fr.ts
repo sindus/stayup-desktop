@@ -16,6 +16,10 @@ export const fr = {
     allFeeds: "Tous les flux",
     loading: "Chargement…",
     retry: "Réessayer",
+    noContent: "Aucun contenu disponible.",
+    confirmDelete: 'Supprimer "{id}" ?',
+    tokenMissing: "Token manquant",
+    deleteAriaLabel: "Supprimer ce flux",
     providers: {
       changelog: "GitHub Changelog",
       youtube: "YouTube",
@@ -68,10 +72,15 @@ export const fr = {
   viewer: {
     selectItem: "Sélectionnez un élément.",
     noTitle: "Sans titre",
+    thumbnail: "Miniature",
+    repository: "dépôt",
     openOnGithub: "Voir sur GitHub",
     watchOnYoutube: "Voir sur YouTube",
     readArticle: "Lire l'article",
     visitWebsite: "Visiter le site",
+  },
+  common: {
+    error: "Une erreur est survenue.",
   },
   userMenu: {
     signOut: "Déconnexion",

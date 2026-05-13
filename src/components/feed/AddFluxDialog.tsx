@@ -73,7 +73,7 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
     setSubmitting(true)
     try {
       const [token, apiUrl] = await Promise.all([readToken(), readApiUrl()])
-      if (!token) throw new Error("Token manquant")
+      if (!token) throw new Error(t.feed.tokenMissing)
 
       if (provider === "scrap") {
         await subscribeScrap(Number(scrapRepoId), token, apiUrl)
@@ -90,7 +90,7 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
       onSuccess()
       handleClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.")
+      setError(err instanceof Error ? err.message : t.common.error)
     } finally {
       setSubmitting(false)
     }
@@ -121,10 +121,10 @@ export function AddFluxDialog({ open, onClose, userId, onSuccess }: AddFluxDialo
               }}
               className="w-full rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
             >
-              <option value="changelog">GitHub Changelog</option>
-              <option value="youtube">YouTube</option>
-              <option value="rss">RSS</option>
-              <option value="scrap">Scraping web</option>
+              <option value="changelog">{t.feed.providers.changelog}</option>
+              <option value="youtube">{t.feed.providers.youtube}</option>
+              <option value="rss">{t.feed.providers.rss}</option>
+              <option value="scrap">{t.feed.providers.scrap}</option>
             </select>
           </div>
 

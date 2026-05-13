@@ -18,6 +18,10 @@ export const en: Translations = {
     allFeeds: "All feeds",
     loading: "Loading…",
     retry: "Retry",
+    noContent: "No content available.",
+    confirmDelete: 'Delete "{id}"?',
+    tokenMissing: "Missing token",
+    deleteAriaLabel: "Delete this feed",
     providers: {
       changelog: "GitHub Changelog",
       youtube: "YouTube",
@@ -70,10 +74,15 @@ export const en: Translations = {
   viewer: {
     selectItem: "Select an item.",
     noTitle: "Untitled",
+    thumbnail: "Thumbnail",
+    repository: "repository",
     openOnGithub: "View release on GitHub",
     watchOnYoutube: "Watch on YouTube",
     readArticle: "Read article",
     visitWebsite: "Visit website",
+  },
+  common: {
+    error: "An error occurred.",
   },
   userMenu: {
     signOut: "Sign out",

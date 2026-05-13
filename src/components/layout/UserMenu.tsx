@@ -1,4 +1,5 @@
 import { useLanguage } from "@/context/LanguageContext"
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher"
 import type { AppSession } from "@/lib/session"
 
 interface UserMenuProps {
@@ -11,6 +12,7 @@ export function UserMenu({ session, onLogout }: UserMenuProps) {
 
   return (
     <div className="flex items-center gap-3">
+      <LanguageSwitcher />
       <span className="text-sm text-muted-foreground truncate max-w-[160px]">{session.email}</span>
       <button
         onClick={onLogout}

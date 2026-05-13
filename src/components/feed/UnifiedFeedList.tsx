@@ -6,6 +6,7 @@ import type {
   Provider,
 } from "@/types"
 import { formatDate } from "@/lib/utils"
+import { useLanguage } from "@/context/LanguageContext"
 
 function extractHostname(url: string): string {
   try {
@@ -97,10 +98,12 @@ export function UnifiedFeedList({
   onSelect,
   repositories,
 }: UnifiedFeedListProps) {
+  const { t } = useLanguage()
+
   if (items.length === 0) {
     return (
       <p className="text-[13px] text-muted-foreground italic py-12 text-center">
-        Aucun contenu disponible.
+        {t.feed.noContent}
       </p>
     )
   }
@@ -136,11 +139,12 @@ export function UnifiedFeedList({
                   repoUrl={repoUrlMap[tagged.item.repository_id] ?? ""}
                   color={color}
                   dimColor={PROVIDER_DIM[tagged.provider]}
+                  repositoryLabel={t.viewer.repository}
                 />
               )}
-              {tagged.provider === "youtube" && <YoutubeEntry item={tagged.item} color={color} />}
-              {tagged.provider === "rss" && <RssEntry item={tagged.item} color={color} />}
-              {tagged.provider === "scrap" && <ScrapEntry item={tagged.item} color={color} />}
+              {tagged.provider === "youtube" && <YoutubeEntry item={tagged.item} color={color} noTitle={t.viewer.noTitle} />}
+              {tagged.provider === "rss" && <RssEntry item={tagged.item} color={color} noTitle={t.viewer.noTitle} />}
+              {tagged.provider === "scrap" && <ScrapEntry item={tagged.item} color={color} scrapLabel={t.feed.providers.scrap} />}
             </div>
           </div>
         )
@@ -154,18 +158,20 @@ function ChangelogEntry({
   repoUrl,
   color,
   dimColor,
+  repositoryLabel,
 }: {
   item: import("@/types").ChangelogItem
   repoUrl: string
   color: string
   dimColor: string
+  repositoryLabel: string
 }) {
   return (
     <div>
       <div className="flex items-center justify-between gap-2 mb-0.5">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-[12px] font-mono text-muted-foreground truncate">
-            {repoUrl?.replace("https://github.com/", "") ?? "repository"}
+            {repoUrl?.replace("https://github.com/", "") ?? repositoryLabel}
           </span>
           <span
             className="text-[11px] font-mono font-semibold px-1.5 py-0.5 rounded shrink-0"
@@ -190,7 +196,7 @@ function ChangelogEntry({
   )
 }
 
-function YoutubeEntry({ item, color }: { item: import("@/types").YoutubeItem; color: string }) {
+function YoutubeEntry({ item, color, noTitle }: { item: import("@/types").YoutubeItem; color: string; noTitle: string }) {
   let parsed: YoutubeItemContent | null = null
   try {
     parsed = JSON.parse(item.content) as YoutubeItemContent
@@ -230,7 +236,7 @@ function YoutubeEntry({ item, color }: { item: import("@/types").YoutubeItem; co
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-[13px] font-medium line-clamp-2 leading-snug text-gray-900 dark:text-gray-100 mb-0.5">
-          {parsed?.title ?? "Sans titre"}
+          {parsed?.title ?? noTitle}
         </p>
         <div className="flex items-center gap-2">
           {parsed?.url && (
@@ -247,7 +253,7 @@ function YoutubeEntry({ item, color }: { item: import("@/types").YoutubeItem; co
   )
 }
 
-function RssEntry({ item, color }: { item: import("@/types").RssItem; color: string }) {
+function RssEntry({ item, color, noTitle }: { item: import("@/types").RssItem; color: string; noTitle: string }) {
   let parsed: RssItemContent | null = null
   try {
     parsed = JSON.parse(item.content) as RssItemContent
@@ -261,7 +267,7 @@ function RssEntry({ item, color }: { item: import("@/types").RssItem; color: str
     <div>
       <div className="flex items-start justify-between gap-2 mb-0.5">
         <span className="text-[13px] font-medium line-clamp-1 text-gray-900 dark:text-gray-100">
-          {parsed?.title ?? "Sans titre"}
+          {parsed?.title ?? noTitle}
         </span>
         <span className="text-[11px] font-mono shrink-0 text-gray-500">
           {formatDate(item.datetime ?? item.executed_at)}
@@ -276,7 +282,7 @@ function RssEntry({ item, color }: { item: import("@/types").RssItem; color: str
   )
 }
 
-function ScrapEntry({ item, color }: { item: import("@/types").ScrapItem; color: string }) {
+function ScrapEntry({ item, color, scrapLabel }: { item: import("@/types").ScrapItem; color: string; scrapLabel: string }) {
   const params: ScrapItemParams | null =
     typeof item.params === "string"
       ? (() => {
@@ -294,7 +300,7 @@ function ScrapEntry({ item, color }: { item: import("@/types").ScrapItem; color:
     <div>
       <div className="flex items-start justify-between gap-2 mb-0.5">
         <span className="text-[13px] font-medium line-clamp-1 text-gray-900 dark:text-gray-100">
-          {item.content?.slice(0, 80) ?? params?.url ?? "Scrap"}
+          {item.content?.slice(0, 80) ?? params?.url ?? scrapLabel}
         </span>
         <span className="text-[11px] font-mono shrink-0 text-gray-500">
           {formatDate(item.executed_at)}

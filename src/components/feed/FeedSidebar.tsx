@@ -105,11 +105,11 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
 
   async function handleDelete(flux: FeedFlux, e: React.MouseEvent) {
     e.stopPropagation()
-    if (!confirm(`Supprimer "${flux.identifier}" ?`)) return
+    if (!confirm(t.feed.confirmDelete.replace('{id}', flux.identifier))) return
     setDeleting(flux.id)
     try {
       const [token, apiUrl] = await Promise.all([readToken(), readApiUrl()])
-      if (!token) throw new Error("Token manquant")
+      if (!token) throw new Error(t.feed.tokenMissing)
       await deleteUserRepository(userId, flux.id, token, apiUrl)
       onRefresh()
     } finally {
@@ -260,7 +260,7 @@ export function FeedSidebar({ fluxes, userId, onRefresh }: FeedSidebarProps) {
                             onClick={(e) => handleDelete(flux, e)}
                             disabled={deleting === flux.id}
                             className="shrink-0 p-1 mr-1 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity disabled:opacity-50"
-                            aria-label="Supprimer ce flux"
+                            aria-label={t.feed.deleteAriaLabel}
                           >
                             <Trash2 className="h-3 w-3" />
                           </button>

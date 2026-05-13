@@ -9,6 +9,7 @@ import type {
   Provider,
 } from "@/types"
 import { formatDate, openUrl } from "@/lib/utils"
+import { useLanguage } from "@/context/LanguageContext"
 
 function extractHostname(url: string): string {
   try {
@@ -51,10 +52,12 @@ interface FeedItemListProps {
 }
 
 export function FeedItemList({ items, provider, repositories = [] }: FeedItemListProps) {
+  const { t } = useLanguage()
+
   if (items.length === 0) {
     return (
       <p className="text-sm text-muted-foreground italic py-12 text-center">
-        Aucun contenu disponible.
+        {t.feed.noContent}
       </p>
     )
   }
@@ -77,11 +80,11 @@ export function FeedItemList({ items, provider, repositories = [] }: FeedItemLis
         ))}
       {provider === "youtube" &&
         (sorted as YoutubeItem[]).map((item) => (
-          <YoutubeEntry key={item.id} item={item} color={PROVIDER_COLORS[provider]} />
+          <YoutubeEntry key={item.id} item={item} color={PROVIDER_COLORS[provider]} noTitle={t.viewer.noTitle} thumbnail={t.viewer.thumbnail} />
         ))}
       {provider === "rss" &&
         (sorted as RssItem[]).map((item) => (
-          <RssEntry key={item.id} item={item} color={PROVIDER_COLORS[provider]} />
+          <RssEntry key={item.id} item={item} color={PROVIDER_COLORS[provider]} noTitle={t.viewer.noTitle} />
         ))}
       {provider === "scrap" &&
         (sorted as ScrapItem[]).map((item) => (
@@ -129,7 +132,7 @@ function ChangelogEntry({ item, repoUrl }: { item: ChangelogItem; repoUrl: strin
   )
 }
 
-function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
+function YoutubeEntry({ item, color, noTitle, thumbnail }: { item: YoutubeItem; color: string; noTitle: string; thumbnail: string }) {
   let parsed: YoutubeItemContent | null = null
   try {
     parsed = JSON.parse(item.content) as YoutubeItemContent
@@ -142,7 +145,7 @@ function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
       {parsed?.thumbnail && (
         <img
           src={parsed.thumbnail}
-          alt={parsed?.title ?? "Thumbnail"}
+          alt={parsed?.title ?? thumbnail}
           width={120}
           height={68}
           loading="lazy"
@@ -151,7 +154,7 @@ function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
       )}
       <div className="space-y-1 min-w-0">
         <p className="font-medium text-sm line-clamp-2 text-gray-100">
-          {parsed?.title ?? "Sans titre"}
+          {parsed?.title ?? noTitle}
         </p>
         <div className="flex items-center gap-2">
           {parsed?.url && (
@@ -184,7 +187,7 @@ function YoutubeEntry({ item, color }: { item: YoutubeItem; color: string }) {
   )
 }
 
-function RssEntry({ item, color }: { item: RssItem; color: string }) {
+function RssEntry({ item, color, noTitle }: { item: RssItem; color: string; noTitle: string }) {
   let parsed: RssItemContent | null = null
   try {
     parsed = JSON.parse(item.content) as RssItemContent
@@ -198,7 +201,7 @@ function RssEntry({ item, color }: { item: RssItem; color: string }) {
     <div className="space-y-1 border-l-2 border-muted pl-3 py-1">
       <div className="flex items-center justify-between gap-2">
         <span className="font-medium text-sm line-clamp-1 text-gray-100">
-          {parsed?.title ?? "Sans titre"}
+          {parsed?.title ?? noTitle}
         </span>
         <span className="text-xs text-gray-500 shrink-0">
           {formatDate(item.datetime ?? item.executed_at)}
