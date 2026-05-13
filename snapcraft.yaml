@@ -20,7 +20,7 @@ parts:
       - curl
       - file
       - libwebkit2gtk-4.1-dev
-      - libappindicator3-dev
+      - libayatana-appindicator3-dev
       - librsvg2-dev
       - patchelf
       - build-essential
@@ -29,9 +29,10 @@ parts:
       - node/20/stable
     override-build: |
       cd $SNAPCRAFT_PART_SRC
-      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-      export HOME=/root
-      export PATH=$HOME/.cargo/bin:$PATH
+      # Use the system user's rustup installation (works under sudo too)
+      export CARGO_HOME=/home/sikander/.cargo
+      export RUSTUP_HOME=/home/sikander/.rustup
+      export PATH="$CARGO_HOME/bin:$PATH"
       npm ci
       npm run build
       cd src-tauri && cargo build --release && cd $SNAPCRAFT_PART_SRC
@@ -49,7 +50,7 @@ parts:
         "$SNAPCRAFT_PART_INSTALL/usr/share/applications/stayup.desktop"
     stage-packages:
       - libwebkit2gtk-4.1-0
-      - libappindicator3-1
+      - libayatana-appindicator3-1
       - libgtk-3-0
       - libglib2.0-0
       - libgdk-pixbuf-2.0-0
@@ -60,6 +61,10 @@ parts:
 layout:
   /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1:
     bind: $SNAP/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
+
+plugs:
+  browser-support:
+    allow-sandbox: false
 
 apps:
   stayup:
@@ -79,6 +84,5 @@ apps:
       - wayland
       - opengl
       - audio-playback
-      - browser-support:
-          allow-sandbox: false
+      - browser-support
       - gsettings
